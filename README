@@ -1,0 +1,15 @@
+Ozone photochemistry model originally created by Eleonora Alei 2018 with contributions from Dave Pawlowski.  Simple photochemical model that uses minimal chemistry with a static temperature profile to produce an ozone layer.  
+
+Usage:
+    python main.py
+
+Inputs:
+    Specified in input/input???.inp files.  More than one input file can be specified in order to perform batch runs.
+
+Outputs:
+    Based on output time specified in input file, files are saved to data directory.
+
+Basic analysis software is included.  See plot*.py files.  Necessary plotting modules are included in srcOutput directory.
+
+
+
