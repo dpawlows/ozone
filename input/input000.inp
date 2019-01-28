@@ -1,3 +1,4 @@
+#RADIATIONPARAMETERS
 1.0
 0.21
 1
@@ -6,4 +7,15 @@
 1.0
 1.0
 237.063219
-100
+
+#TEND
+100    (days)
+
+#DTOUT
+86400    (seconds)
+
+#USEPHOTODATA
+T
+
+#TSTEP
+900

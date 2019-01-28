@@ -7,9 +7,7 @@ import pdb
 def updateRates(temp):
     #cm3/s or cm6/s
     s.kO2_O=6e-34*(temp/(298))**(-2.3)
-    #s.kO2_O=6.6e-35*np.exp(510/temp)
     s.kO3_O=8e-12*np.exp(-2061/temp)
-    #s.kO3_O=1.9e-11*np.exp(-2300/temp)
     s.kCl_O3=2.8e-11*np.exp(-2100/temp)
     s.kCl_O=3e-11*np.exp(+600/temp)
     s.kBr_O3=1.7e-11*np.exp(-6600/temp)
@@ -139,8 +137,7 @@ def func(u,PhotoDissRate,N):
     return sources-losses
 
 
-
-def calcChemistry(u0,iAlt,N,temp,dt,chemsolver='simple'):
+def calcChemistry(u0,PhotoDissRate,N,temp,dt,chemsolver='simple',iAlt=None):
     iError = updateRates(temp)
     #Chose chemical solver
     if chemsolver == "explicit":
@@ -153,47 +150,34 @@ def calcChemistry(u0,iAlt,N,temp,dt,chemsolver='simple'):
         update = [0]*s.nMajorSpecies
 
         #equilibrium between O and O3:
-        update[s.iO] = (2*s.O2PhotoDissociationRate[iAlt]*u0[s.iO2] + \
-        s.O3PhotoDissociationRate[iAlt]*u0[s.iO3]) \
+        update[s.iO] = (2*PhotoDissRate[s.iPhotoO2]*u0[s.iO2] + \
+        PhotoDissRate[s.iPhotoO3]*u0[s.iO3]) \
         / (s.kO2_O*u0[s.iO2]*N+s.kO3_O*u0[s.iO3])
-        # print(s.O2PhotoDissociationRate[iAlt],\
-        # s.O3PhotoDissociationRate[iAlt])
+
         ### 03 chemistry
         ###O2 + O + M -> O3 + M
         r = s.kO2_O*u0[s.iO2]*update[s.iO]*N
         sources[s.iO3] += r
-        # if s.istep == 750:
-        # print(r,u0[s.iO2],update[s.iO],N)
-        #losses[s.iO] += r
 
         ###O3 + hv -> O2 + O
-        r = s.O3PhotoDissociationRate[iAlt]*u0[s.iO3]
+        r = PhotoDissRate[s.iPhotoO3]*u0[s.iO3]
         losses[s.iO3] += r
-        #sources[s.iO] += r
-        # if s.istep == 750:
-        # print(r)
+
         ###O3 + O -> 2O2
         r = s.kO3_O*u0[s.iO3]*update[s.iO]
         losses[s.iO3] += r
-        #losses[s.iO] += r
-        # if s.istep == 750:
-        # print(r)
-        # if s.istep == 750:
-        # pdb.set_trace()
+
+
+        #update the density arrays
         update[s.iO3] = u0[s.iO3]+dt*(sources[s.iO3] - losses[s.iO3])
-
-
-        #Any change in O or O3 must have come from O2
-        update[s.iO2] = u0[s.iO2]# - (update[s.iO]-u0[s.iO]) - \
-        #     (update[s.iO3]-u0[s.iO3])
-
-        # #No change for these:
+        update[s.iO2] = u0[s.iO2] #O2 stays constant
+        #No change for these:
         # update[s.iNO2] = u0[s.iNO2]
         # update[s.iNO] = u0[s.iNO]
 
     else:
-        print('No chemistry solver specified.')
-        print('Stopping in chemistry.py')
+        print('----Error: No chemistry solver specified.')
+        print('----Stopping in chemistry.py')
         exit(1)
 
     return update
