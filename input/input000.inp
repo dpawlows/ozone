@@ -9,7 +9,7 @@
 237.063219
 
 #TEND
-100    (days)
+100   (days)
 
 #DTOUT
 86400    (seconds)
@@ -19,3 +19,6 @@ T
 
 #TSTEP
 900
+
+#CHEMISTRY
+simple    (simple or explicit <-- needs tiny time step!!)

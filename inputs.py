@@ -21,10 +21,18 @@ def readlogical(f):
 
     return value,0
 
+def readchar(f):
+    temp = f.readline()
+    t = temp.strip().lower().split()[0]
+
+    if  t != "simple" and t != "explicit":
+        return None,1
+    return t,0
+
 def readInputData(file):
     global usePhotoData, pressure, O2mixingratio, rPlanet
     global rStar, tStar, distancePlanet, massPlanet, tempPlanet
-    global dtOut, tstep, tEnd
+    global dtOut, tstep, tEnd, chemsolver
 
     f = open(file,'r')
 
@@ -55,7 +63,7 @@ def readInputData(file):
 
         if line.strip().upper() == "#DTOUT":
             dtOut,iError = readfloat(f)
-            
+
             if iError > 0:
                 print("Error in readInputData")
                 print("#DTOUT")
@@ -85,6 +93,15 @@ def readInputData(file):
                 print("Error in readInputData")
                 print("#TSTEP")
                 print("float (days)")
+                exit(iError)
+
+        if line.strip().upper() == "#CHEMISTRY":
+            chemsolver,iError = readchar(f)
+
+            if iError > 0:
+                print("Error in readInputData")
+                print("#CHEMISTRY")
+                print("simple or explicit (watch the time step for explicit!)")
                 exit(iError)
 
     f.close()

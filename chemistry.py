@@ -50,10 +50,10 @@ def func(u,PhotoDissRate,N):
         print(sources)
         print(losses)
     ###NO2 + hv -> NO + O
-    r = PhotoDissRate[s.iPhotoNO2] * u0[s.iNO2]
-    losses[s.iNO2] += r
+    r = PhotoDissRate[s.iPhotoNO2] * u[s.iNO2]
+    # losses[s.iNO2] += r
     sources[s.iO] += r
-    source[s.iNO] += r
+    sources[s.iNO] += r
     if debug > 0:
         print("NO2 + hv -> NO + O")
         print(sources)
@@ -80,8 +80,8 @@ def func(u,PhotoDissRate,N):
         print(losses)
     ######NO Chemistry
     ###NO + O3 -> NO2 + O2
-    r = s.kNO_O3*u0[s.iNO2]*u0[s.iO3]
-    sources[s.iNO2] += r
+    r = s.kNO_O3*u[s.iNO2]*u[s.iO3]
+    #  sources[s.iNO2] += r
     losses[s.iO3] += r
     losses[s.iNO] += r
     sources[s.iO2] += r
@@ -91,7 +91,7 @@ def func(u,PhotoDissRate,N):
         print(losses)
     ###NO2 + O -> NO + O2
     r = s.kNO2_O*u[s.iNO2]*u[s.iO]
-    losses[s.iNO2] += r
+    # losses[s.iNO2] += r
     losses[s.iO] += r
     sources[s.iNO] += r
     sources[s.iO2] += r
@@ -167,6 +167,15 @@ def calcChemistry(u0,PhotoDissRate,N,temp,dt,chemsolver='simple',iAlt=None):
         r = s.kO3_O*u0[s.iO3]*update[s.iO]
         losses[s.iO3] += r
 
+        ### Cl + O3 -> ClO + O2
+        r = s.kCl_O3*u0[s.iO3]*s.cl
+        # sources[s.iO2] += r
+        losses[s.iO3] += r
+
+        ### Br + O3 -> BrO + O2
+        r = s.kBr_O3*s.br*u0[s.iO2]
+        # sources[s.iO2] += r
+        losses[s.iO3] += r
 
         #update the density arrays
         update[s.iO3] = u0[s.iO3]+dt*(sources[s.iO3] - losses[s.iO3])

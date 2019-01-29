@@ -224,7 +224,8 @@ for f in files:
 
             y =\
             chemistry.calcChemistry(density,PhotoDissRate,s.N[iAlt],
-                s.Temperature[iAlt],inputs.tstep,chemsolver="simple",\
+                s.Temperature[iAlt],inputs.tstep,\
+                chemsolver=inputs.chemsolver,\
                 iAlt=iAlt)
 
             s.O2[iAlt]=y[s.iO2]
