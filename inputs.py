@@ -32,7 +32,7 @@ def readchar(f):
 def readInputData(file):
     global usePhotoData, pressure, O2mixingratio, rPlanet
     global rStar, tStar, distancePlanet, massPlanet, tempPlanet
-    global dtOut, tstep, tEnd, chemsolver
+    global dtOut, tstep, tEnd, chemsolver, sza
 
     f = open(file,'r')
 
@@ -103,6 +103,7 @@ def readInputData(file):
                 print("#CHEMISTRY")
                 print("simple or explicit (watch the time step for explicit!)")
                 exit(iError)
+
 
     f.close()
 

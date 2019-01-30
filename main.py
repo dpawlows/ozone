@@ -6,95 +6,6 @@ Created on Wed Aug 29 15:46:28 2018
 @author: eleonoraalei
 """
 import pdb
-
-
-#%% FUNCTIONS
-def blackbody_nu(in_x, temperature):
-    FNU = u.erg / (u.cm**2 * u.s * u.Hz)
-    FLAM = u.erg / (u.cm**2 * u.s * u.AA)
-    """Calculate blackbody flux per steradian, :math:`B_{\\nu}(T)`.
-
-    .. note::
-
-        Use `numpy.errstate` to suppress Numpy warnings, if desired.
-
-    .. warning::
-
-        Output values might contain ``nan`` and ``inf``.
-
-    Parameters
-    ----------
-    in_x : number, array-like, or `~astropy.units.Quantity`
-        Frequency, wavelength, or wave number.
-        If not a Quantity, it is assumed to be in Hz.
-
-    temperature : number, array-like, or `~astropy.units.Quantity`
-        Blackbody temperature.
-        If not a Quantity, it is assumed to be in Kelvin.
-
-    Returns
-    -------
-    flux : `~astropy.units.Quantity`
-        Blackbody monochromatic flux in
-        :math:`erg \\; cm^{-2} s^{-1} Hz^{-1} sr^{-1}`.
-
-    Raises
-    ------
-    ValueError
-        Invalid temperature.
-
-    ZeroDivisionError
-        Wavelength is zero (when converting to frequency).
-
-    """
-    # Convert to units for calculations, also force double precision
-    with u.add_enabled_equivalencies(u.spectral() + u.temperature()):
-        freq = u.Quantity(in_x, u.Hz, dtype=np.float64)
-        temp = u.Quantity(temperature, u.K, dtype=np.float64)
-
-
-    log_boltz = const.h * freq / (const.k_B * temp)
-    boltzm1 = np.expm1(log_boltz)
-
-    # Calculate blackbody flux
-    bb_nu = (2.0 * const.h * freq ** 3 / (const.c ** 2 * boltzm1))
-    flux = bb_nu.to(FNU, u.spectral_density(freq))
-
-    return flux / u.sr  # Add per steradian to output flux unit
-
-
-
-def blackbody_lambda(in_x, temperature):
-    FNU = u.erg / (u.cm**2 * u.s * u.Hz)
-    FLAM = u.erg / (u.cm**2 * u.s * u.AA)
-    """Like :func:`blackbody_nu` but for :math:`B_{\\lambda}(T)`.
-
-    Parameters
-    ----------
-    in_x : number, array-like, or `~astropy.units.Quantity`
-        Frequency, wavelength, or wave number.
-        If not a Quantity, it is assumed to be in Angstrom.
-
-    temperature : number, array-like, or `~astropy.units.Quantity`
-        Blackbody temperature.
-        If not a Quantity, it is assumed to be in Kelvin.
-
-    Returns
-    -------
-    flux : `~astropy.units.Quantity`
-        Blackbody monochromatic flux in
-        :math:`erg \\; cm^{-2} s^{-1} \\mathring{A}^{-1} sr^{-1}`.
-
-    """
-    if getattr(in_x, 'unit', None) is None:
-        in_x = u.Quantity(in_x, u.AA)
-
-    bb_nu = blackbody_nu(in_x, temperature) * u.sr  # Remove sr for conversion
-    flux = bb_nu.to(FLAM, u.spectral_density(in_x))
-
-    return flux / u.sr  # Add per steradian to output flux unit
-
-
 import glob
 from astropy import constants as const
 from astropy import units as u
@@ -112,11 +23,11 @@ from matplotlib import pyplot as pp
 path_input="input/"
 files=glob.glob(path_input+"*.inp")
 iError = s.init()
-
+sza = 0
 j=0
 for f in files:
     j=j+1
-    sza = 0
+
     #Specify scaling for photo crosssections.
     phiO2_200=1.
     phiO2_400=0.
@@ -151,7 +62,7 @@ for f in files:
 
         wavelengths = wavelengths*u.nm
         pdb.set_trace()
-        flux_lam = blackbody_lambda(wavelengths, s.tstar)
+        flux_lam = photo.blackbody_lambda(wavelengths, s.tstar)
         fl=flux_lam.to(u.W / u.nm / u.m**2  / u.sr)
         fl=fl*(s.R_star/s.D_pl)**2*u.sr*3.1415
 
@@ -210,7 +121,7 @@ for f in files:
                             * (s.Altitude[iAlt-1]-s.Altitude[iAlt])
 
                 intensity = Ftoa[iWave] * \
-                    np.exp(-tau[iWave]/np.arccos(sza))
+                    np.exp(-tau[iWave]/np.arccos(inputs.sza))
 
                 for species in s.PhotoSpecies:
                     #Need two species loops to get tau first

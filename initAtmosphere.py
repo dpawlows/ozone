@@ -47,7 +47,7 @@ def getNOComposition(altitude):
 
 
     for iAlt in range(len(altitude)):
-    
+
         if altitude[iAlt] >= NO2Altitudes[1]:
             tempden[iAlt] = funchigh(altitude[iAlt])
 
@@ -67,7 +67,6 @@ def getNOComposition(altitude):
 
 def initializeAtmosphere(f):
     input_data = inputs.readInputData(f)
-
 
     Pressure=[0*i for i in s.Temperature]
     nDensity=[0*i for i in s.Temperature]
@@ -102,6 +101,10 @@ def initializeAtmosphere(f):
     s.NO =[1e9]*len(s.Altitude)
     s.OH = getOHComposition(s.Altitude)
 
+    # s.density = np.zeros((nlayers,nMajorSpecies))
+    # for ispecies in range(len(s.nMajorSpecies)):
+    #     for ialt = in range(nlayers):
+    #         s.density[ialt,ispecies] =
 
 
     return 0

@@ -17,6 +17,7 @@ def init():
     global iPhotoO2,iPhotoO3,iPhotoNO2, nPhotoSpecies
     global istep, dtprint, tEnd, totaltime
     global nSecondsInDay, nSecoundsInHour, nSecondsInMinute
+    global density, sza
 
     dtprint = 3600
     istep = 0
