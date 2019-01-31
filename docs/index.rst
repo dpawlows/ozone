@@ -11,7 +11,7 @@ Welcome to EOM's documentation!
 
    usage
    inputs
-   :caption: Contents:
+
 
 Eleonor's Ozone Model is a 1D photochemical model that solves for
 the production and loss of ozone in an atmosphere.  The goal of this
