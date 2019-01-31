@@ -1,6 +1,6 @@
-=======
+===============
 Getting Started
-=======
+===============
 To install the code, execute::
 
   >>install.sh
@@ -22,4 +22,4 @@ input???.inp
 EOM is capable of reading multiple input files to complete an
 ensemble of simulations.
 
-See :doc:`inputs` for specific input options and descriptions.
+See :ref:`inputs` for specific input options and descriptions.
