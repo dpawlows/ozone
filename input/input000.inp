@@ -16,6 +16,7 @@
 
 #USEPHOTODATA
 T
+input/sorce_ssi_l3.csv
 
 #TSTEP
 900

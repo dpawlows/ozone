@@ -8,6 +8,9 @@ Welcome to EOM's documentation!
 
 .. toctree::
    :maxdepth: 2
+
+   usage
+   inputs
    :caption: Contents:
 
 Eleonor's Ozone Model is a 1D photochemical model that solves for
