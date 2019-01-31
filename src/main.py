@@ -156,7 +156,7 @@ for f in files:
         if s.totaltime % inputs.dtOut < inputs.tstep:
             print("Writing output at {:6.1f}h".format(s.totaltime/3600.))
             iError = output.output()
-
+            
 
     print("Completed in istep: {}; run time: {}s; elapsed time: {:03.1f}s".format(s.istep,s.totaltime,elapsedTime))
     print('{:g}'.format(max(s.O3)))

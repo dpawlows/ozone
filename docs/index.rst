@@ -9,7 +9,7 @@ Welcome to EOM's documentation!
 .. toctree::
    :maxdepth: 2
 
-   usage
+   gettingstarted
    inputs
 
 
