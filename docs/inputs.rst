@@ -7,6 +7,9 @@ Each of the inputs are listed below.  The order of each input type
 **does not** matter.  EOM searches for the specific headers (including
 the # sign) and reads the information accordingly.  The order of
 the parameters within each type **does** need to be as written here.
+An example input file is created upon installation.  The user
+should examine this file and modify as necessary prior to
+running the code.
 
 **Required: #DTOUT**::
 

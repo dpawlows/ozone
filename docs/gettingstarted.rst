@@ -1,7 +1,7 @@
 ===============
 Getting Started
 ===============
-To install the code, clone from github an execute::
+To install the code, clone from github and execute::
 
   >>install.sh
 
@@ -30,6 +30,6 @@ in a single csv file
 (see the :ref:`#PHOTODATA <photodata>` input)
 in which the first two columns are wavelength (nm) and irradiance
 (:math:`W/m^2/nm`)
-respectively.  EOM uses set bins and will integrate
+respectively.  EOM uses specific wavelength bins and will integrate
 those specified in the input file to fit with what is used
 in the code.
