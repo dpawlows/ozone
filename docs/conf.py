@@ -14,6 +14,7 @@
 #
 import os
 import sys
+import guzzle_sphinx_theme
 sys.path.insert(0, os.path.abspath('../src/'))
 sys.path.insert(0, os.path.abspath('../input/'))
 
@@ -79,8 +80,8 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
-
+#html_theme = 'alabaster'
+html_theme = 'agogo'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
@@ -101,6 +102,7 @@ html_static_path = ['_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
+
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
