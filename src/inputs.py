@@ -88,7 +88,9 @@ def readInputData(file):
 
         if line.strip().upper() == "#USEPHOTODATA":
             usePhotoData,iError= readlogical(f)
-            photoFile,iError = readchar(f)
+            if usePhotoData:
+                photoFile,iError = readchar(f)
+
             if iError > 0:
                 print("Error in readInputData")
                 print("#USEPHOTODATA")

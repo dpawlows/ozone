@@ -146,7 +146,7 @@ def getPhotoCrosssections():
     '''Fill the settings.photocrosssections arrays with
     appropriate values.
 
-    Data taken from input/*crosssections.dat
+    Data taken from input/\*crosssections.dat
     files from phidrates.space.swri.edu'''
     iError = 0
 
@@ -206,8 +206,8 @@ def getIrradiance():
 
     irradianceFile = inputs.photoFile
     wave,tempirradiance = \
-        np.loadtxt(irradianceFile, usecols=(1,2),\
-        delimiter=",",unpack=True,skiprows=1)
+        np.loadtxt(irradianceFile, usecols=(0,1),\
+        delimiter=",",unpack=True)
 
     wl = s.wavelengthLow
     wh = s.wavelengthHigh
