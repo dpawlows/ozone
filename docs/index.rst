@@ -24,6 +24,9 @@ that are supplied by the user.  Currently, EOM uses a small set
 of chemical equations that are necessary to produce an ozone layer
 at Earth under current atmospheric (T and P) conditions.
 
+If this is the first time using the model, start with :ref:`gettingstarted` and then be sure to review the
+:ref:`inputs` prior to running the model for the first time.
+
 
 Indices and tables
 ==================
