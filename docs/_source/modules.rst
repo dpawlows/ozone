@@ -7,7 +7,6 @@ src
    chemistry
    initAtmosphere
    inputs
-   main
    output
    photo
    settings
