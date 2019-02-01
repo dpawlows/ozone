@@ -1,7 +1,11 @@
+"""Methods related to producing model output"""
 import settings as s
 
 def output(type=None):
-    '''Output to file.  Default is major species at all altitudes'''
+    """Output to file.  Currently only option is to output
+    all major species at all
+    altitudes.
+    """
     days, remainder = divmod(s.totaltime,s.nSecondsInDay)
     hours, remainder = divmod(remainder, s.nSecoundsInHour)
     minutes, seconds = divmod(remainder, s.nSecondsInMinute)

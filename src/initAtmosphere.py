@@ -1,3 +1,6 @@
+"""Methods required to initialize the background atmosphereself.
+"""
+
 from scipy import interpolate
 import numpy as np
 import settings as s
@@ -6,6 +9,9 @@ from matplotlib import pyplot as pp
 import inputs
 
 def log_interp1d(xx, yy, kind='linear',fill_value=''):
+    """Perform log interpolation in 1D
+    """
+
     logy = np.log10(yy)
     lin_interp = interpolate.interp1d(xx, logy,\
         kind=kind,fill_value=fill_value)
@@ -14,7 +20,11 @@ def log_interp1d(xx, yy, kind='linear',fill_value=''):
     return log_interp
 
 def getOHComposition(altitude):
-    #NO2 and OH profiles taken from Cunnold et al. 1975
+    """Retrieve vertical OH profile.
+
+    NO2 and OH profiles taken from Cunnold et al. 1975
+    """
+
     OHDensity = [1.2e6,1.1e7]
     OHAltitudes = [i*1e5 for i in [70,41.5]]
     tempden = [0]*len(altitude)
@@ -26,7 +36,10 @@ def getOHComposition(altitude):
     return tempden
 
 def getNOComposition(altitude):
-    #NO2 and OH profiles taken from Cunnold et al. 1975
+    """Retrieve vertical NO2 profile.
+
+    NO2 and OH profiles taken from Cunnold et al. 1975
+    """
 
     NO2Density = [1e5,2e8,3e9,1.45e9,1.1e9,1.25e9,1e10]
     NO2Altitudes = [i*1.e5 for i in [58,42,26,18,12,11,5]]
@@ -66,6 +79,11 @@ def getNOComposition(altitude):
     return tempden
 
 def initializeAtmosphere(f):
+    """Initialize the background atmosphere including
+    create fundamental parameters like pressure, densities, temperature,
+    etc.
+    """
+
     input_data = inputs.readInputData(f)
 
     Pressure=[0*i for i in s.Temperature]
@@ -101,10 +119,6 @@ def initializeAtmosphere(f):
     s.NO =[1e9]*len(s.Altitude)
     s.OH = getOHComposition(s.Altitude)
 
-    # s.density = np.zeros((nlayers,nMajorSpecies))
-    # for ispecies in range(len(s.nMajorSpecies)):
-    #     for ialt = in range(nlayers):
-    #         s.density[ialt,ispecies] =
 
 
     return 0

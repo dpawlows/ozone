@@ -1,9 +1,14 @@
+"""Methods required for reading user input file.
+"""
+
 import settings as s
 import pdb
 
 iError = 0
 
 def readfloat(f):
+    """Read a floting point variable and return."""
+
     temp = f.readline()
     t = temp.split()
 
@@ -13,6 +18,8 @@ def readfloat(f):
         return None,1
 
 def readlogical(f):
+    """Read a logical and return."""
+
     temp = f.readline()
     if temp.strip().upper()[0] == "T":
         value = True
@@ -22,6 +29,8 @@ def readlogical(f):
     return value,0
 
 def readchar(f):
+    """Read a character string and return."""
+
     temp = f.readline()
     t = temp.strip().lower().split()[0]
     if t == None:
@@ -32,6 +41,11 @@ def readchar(f):
     return t,iError
 
 def readInputData(file):
+    """Read user input file.
+
+    User file(s) are passed as input, but are expected to be
+    located in inputs/\*inp.
+    """
     global usePhotoData, pressure, O2mixingratio, rPlanet
     global rStar, tStar, distancePlanet, massPlanet, tempPlanet
     global dtOut, tstep, tEnd, chemsolver, sza, photoFile

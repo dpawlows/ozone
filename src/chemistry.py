@@ -1,3 +1,6 @@
+"""Methods related to the actual chemical processes used
+in EOM
+"""
 import settings as s
 import numpy as np
 import glob
@@ -5,6 +8,7 @@ from matplotlib import pyplot as pp
 import pdb
 
 def updateRates(temp):
+    '''Update chemical reaction rates given the temperature'''
     #cm3/s or cm6/s
     s.kO2_O=6e-34*(temp/(298))**(-2.3)
     s.kO3_O=8e-12*np.exp(-2061/temp)
@@ -20,7 +24,12 @@ def updateRates(temp):
     return 0
 
 def func(u,PhotoDissRate,N):
-    #full explicity chemistry
+    '''Calculate the full time-dependent chemistry
+    for the current time step explicitly.  This function
+    is only used if the #CHEMISTRY input flag is set to
+    \"explicit\".
+
+    '''
     debug = 0
     sources = np.zeros((s.nMajorSpecies))
     losses = np.zeros((s.nMajorSpecies))
@@ -138,7 +147,34 @@ def func(u,PhotoDissRate,N):
 
 
 def calcChemistry(u0,PhotoDissRate,N,temp,dt,chemsolver='simple',iAlt=None):
+    """Perform the chemistry update.
+
+    The \#CHEMISTRY input flag determines the method to use,
+    simple or explicit.
+
+    Parameters
+    ----------
+
+    u0 : array
+        Input density at a single altitude for all species
+    PhotoDissRate : array
+        Input photo dissociation rates for all photo active
+        species
+    N : float
+        Total number density at single altitude
+    temp : float
+        Temperature at single altitude
+    dt : float
+        Time step
+    chemsolver : char, optional
+        Specify which method to use to solve chemistry
+    iAlt : int, optional
+        Mainly used for debugging
+
+    """
+
     iError = updateRates(temp)
+
     #Chose chemical solver
     if chemsolver == "explicit":
         update = u0 + dt*func(u0,PhotoDissRate,N)

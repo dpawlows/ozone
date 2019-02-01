@@ -1,3 +1,7 @@
+"""Define and initialize global variables necessary to share information between
+modules.
+"""
+
 import pdb
 from astropy import constants as const
 from astropy import units as u
@@ -5,6 +9,13 @@ from matplotlib import pyplot as pp
 import numpy as np
 
 def init():
+    """Initialize global variables including altitude and
+    temperature.
+
+    The altitude and temperature data are read in from files
+    and then used to build the rest of the background atmosphere.
+    """
+
     global JO2, JO3, kO2_O, kO3_3, kCl_O3, kCl_O, kBr_O, kBr_O3
     global br, cl, iO, iO2, iO3, iNO2, iNO
     global Temperature,nLayers, nMajorSpecies

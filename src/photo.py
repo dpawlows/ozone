@@ -1,3 +1,8 @@
+"""Methods required for specifying the irradiance values
+at the top of the atmosphere as well as the photodissociation
+cross sections.
+"""
+
 import settings as s
 import numpy as np
 from matplotlib import pyplot as pp
@@ -6,8 +11,6 @@ import inputs
 import pdb
 
 def blackbody_nu(in_x, temperature):
-    FNU = u.erg / (u.cm**2 * u.s * u.Hz)
-    FLAM = u.erg / (u.cm**2 * u.s * u.AA)
     """Calculate blackbody flux per steradian, :math:`B_{\\nu}(T)`.
 
     .. note::
@@ -19,7 +22,7 @@ def blackbody_nu(in_x, temperature):
         Output values might contain ``nan`` and ``inf``.
 
     Parameters
-    ----------
+
     in_x : number, array-like, or `~astropy.units.Quantity`
         Frequency, wavelength, or wave number.
         If not a Quantity, it is assumed to be in Hz.
@@ -29,13 +32,14 @@ def blackbody_nu(in_x, temperature):
         If not a Quantity, it is assumed to be in Kelvin.
 
     Returns
-    -------
+
     flux : `~astropy.units.Quantity`
         Blackbody monochromatic flux in
         :math:`erg \\; cm^{-2} s^{-1} Hz^{-1} sr^{-1}`.
 
+
     Raises
-    ------
+
     ValueError
         Invalid temperature.
 
@@ -43,6 +47,9 @@ def blackbody_nu(in_x, temperature):
         Wavelength is zero (when converting to frequency).
 
     """
+    FNU = u.erg / (u.cm**2 * u.s * u.Hz)
+    FLAM = u.erg / (u.cm**2 * u.s * u.AA)
+
     # Convert to units for calculations, also force double precision
     with u.add_enabled_equivalencies(u.spectral() + u.temperature()):
         freq = u.Quantity(in_x, u.Hz, dtype=np.float64)
@@ -61,27 +68,12 @@ def blackbody_nu(in_x, temperature):
 
 
 def blackbody_lambda(in_x, temperature):
-    FNU = u.erg / (u.cm**2 * u.s * u.Hz)
-    FLAM = u.erg / (u.cm**2 * u.s * u.AA)
     """Like :func:`blackbody_nu` but for :math:`B_{\\lambda}(T)`.
 
-    Parameters
-    ----------
-    in_x : number, array-like, or `~astropy.units.Quantity`
-        Frequency, wavelength, or wave number.
-        If not a Quantity, it is assumed to be in Angstrom.
-
-    temperature : number, array-like, or `~astropy.units.Quantity`
-        Blackbody temperature.
-        If not a Quantity, it is assumed to be in Kelvin.
-
-    Returns
-    -------
-    flux : `~astropy.units.Quantity`
-        Blackbody monochromatic flux in
-        :math:`erg \\; cm^{-2} s^{-1} \\mathring{A}^{-1} sr^{-1}`.
-
     """
+    FNU = u.erg / (u.cm**2 * u.s * u.Hz)
+    FLAM = u.erg / (u.cm**2 * u.s * u.AA)
+
     if getattr(in_x, 'unit', None) is None:
         in_x = u.Quantity(in_x, u.AA)
 
@@ -91,6 +83,7 @@ def blackbody_lambda(in_x, temperature):
     return flux / u.sr  # Add per steradian to output flux unit
 
 def plotCrosssections(wave,sigma,species=None):
+    '''Plotting routine for quickly checking crosssections'''
     fig=pp.figure()
     ax = fig.add_subplot(221)
     pp.tight_layout()
@@ -105,7 +98,13 @@ def plotCrosssections(wave,sigma,species=None):
 
 def getAverageSigmas(wave,sigmas):
     '''Average the cross sections across the bins specified in
-    wl and wh'''
+    settings.wavelengthHigh and settings.wavelengthLow
+
+    wave: input array specifying the bins to average to
+
+    sigmas: input array specifying the cross sections'''
+
+
     crosssections = []
     wl = s.wavelengthLow
     wh = s.wavelengthHigh
@@ -144,6 +143,11 @@ def getAverageSigmas(wave,sigmas):
     return crosssections
 
 def getPhotoCrosssections():
+    '''Fill the settings.photocrosssections arrays with
+    appropriate values.
+
+    Data taken from input/*crosssections.dat
+    files from phidrates.space.swri.edu'''
     iError = 0
 
     #In order to automate this, the file have to be named
@@ -194,8 +198,10 @@ def getPhotoCrosssections():
     return iError,message
 
 def getIrradiance():
-    #Integrate the irradiance to get the bins that we want
-    #note that the file gives values at 1nm resolution,
+    '''Integrate the irradiance to the bins specified in settings
+
+    '''
+    #Note that the file gives values at 1nm resolution,
     #and units are .../nm, so the sum is the same as the integral
 
     irradianceFile = inputs.photoFile

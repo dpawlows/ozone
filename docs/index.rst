@@ -7,13 +7,15 @@ Welcome to EOM's documentation!
 ===============================
 
 .. toctree::
+   :glob:
    :maxdepth: 2
 
    gettingstarted
    inputs
+   _source/modules
 
 
-Eleonor's Ozone Model is a 1D photochemical model that solves for
+Eleonora's Ozone Model is a 1D photochemical model that solves for
 the production and loss of ozone in an atmosphere.  The goal of this
 model is to determine if it is possible to create an ozone layer
 in exoplanetary atmospheres.  In order to accomplish this, EOM
