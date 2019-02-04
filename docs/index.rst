@@ -34,3 +34,10 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+.. todo::
+
+ - Time dependent irradiances
+ - Realistic orbit option
+ - Alternative temperature and pressure profiles
