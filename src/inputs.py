@@ -1,10 +1,21 @@
 """Methods required for reading user input file.
 """
-
+from datetime import datetime,timedelta
 import settings as s
 import pdb
 
 iError = 0
+
+def readint(f):
+    """Read a floting point variable and return."""
+
+    temp = f.readline()
+    t = temp.split()
+
+    try:
+        return int(t[0]),0
+    except:
+        return None,1
 
 def readfloat(f):
     """Read a floting point variable and return."""
@@ -49,6 +60,7 @@ def readInputData(file):
     global usePhotoData, pressure, O2mixingratio, rPlanet
     global rStar, tStar, distancePlanet, massPlanet, tempPlanet
     global dtOut, tstep, tEnd, chemsolver, sza, photoFile
+    global startTime, endTime
 
     f = open(file,'r')
 
@@ -99,21 +111,19 @@ def readInputData(file):
                 exit(iError)
 
         if line.strip().upper() == "#TSTEP":
+
             tstep,iError= readfloat(f)
+            try:
+                tstep = timedelta(seconds=tstep)
+            except:
+                iError += 1
+
             if iError > 0:
                 print("Error in readInputData")
                 print("#TSTEP")
                 print("float (s)")
                 exit(iError)
 
-        if line.strip().upper() == "#TEND":
-            tEnd,iError= readfloat(f)
-
-            if iError > 0:
-                print("Error in readInputData")
-                print("#TSTEP")
-                print("float (days)")
-                exit(iError)
 
         if line.strip().upper() == "#CHEMISTRY":
             chemsolver,iError = readchar(f)
@@ -125,6 +135,88 @@ def readInputData(file):
                 print("#CHEMISTRY")
                 print("simple or explicit (watch the time step for explicit!)")
                 exit(iError)
+
+        if line.strip().upper() == "#TSTART":
+            syear,iError = readint(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#TSTART")
+                print("year\nmonth\nday\nhour\nminute\nsecond")
+                exit(iError)
+            smonth,iError = readint(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#TSTART")
+                print("year\nmonth\nday\nhour\nminute\nsecond")
+                exit(iError)
+            sday,iError = readint(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#TSTART")
+                print("year\nmonth\nday\nhour\nminute\nsecond")
+                exit(iError)
+            shour,iError = readint(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#TSTART")
+                print("year\nmonth\nday\nhour\nminute\nsecond")
+                exit(iError)
+            sminute,iError = readint(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#TSTART")
+                print("year\nmonth\nday\nhour\nminute\nsecond")
+                exit(iError)
+            ssecond,iError = readint(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#TSTART")
+                print("year\nmonth\nday\nhour\nminute\nsecond")
+                exit(iError)
+
+            startTime = datetime(syear,smonth,sday,\
+                sminute,sminute,ssecond)
+
+        if line.strip().upper() == "#TEND":
+            syear,iError = readint(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#TSTART")
+                print("year\nmonth\nday\nhour\nminute\nsecond")
+                exit(iError)
+            smonth,iError = readint(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#TSTART")
+                print("year\nmonth\nday\nhour\nminute\nsecond")
+                exit(iError)
+            sday,iError = readint(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#TSTART")
+                print("year\nmonth\nday\nhour\nminute\nsecond")
+                exit(iError)
+            shour,iError = readint(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#TSTART")
+                print("year\nmonth\nday\nhour\nminute\nsecond")
+                exit(iError)
+            sminute,iError = readint(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#TSTART")
+                print("year\nmonth\nday\nhour\nminute\nsecond")
+                exit(iError)
+            ssecond,iError = readint(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#TSTART")
+                print("year\nmonth\nday\nhour\nminute\nsecond")
+                exit(iError)
+
+            endTime = datetime(syear,smonth,sday,\
+                shour,sminute,ssecond)
 
 
     f.close()

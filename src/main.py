@@ -16,7 +16,6 @@ import numpy as np
 import settings as s
 import inputs
 import output
-from time import time
 from matplotlib import pyplot as pp
 
 
@@ -42,8 +41,8 @@ for f in files:
 
     #Set irraidiance based on data or blackbody
     if inputs.usePhotoData:
-        flnew = photo.getIrradiance()
-
+        flnew = s.irradiance
+        flnew = flnew[0,:]
         for iWave in range(len(s.wavelengthLow)):
             PhotonEnergy = 6.626e-34*2.998e8 /  \
             ((s.wavelengthLow[iWave]+s.wavelengthHigh[iWave])/ \
@@ -84,20 +83,23 @@ for f in files:
     maxdiffarr=[]
     diffarr=[]
     counter=0
-    s.totaltime=0
+
     diffO3=[0*i for i in s.O3]
     diffO3=np.array(diffO3)
     dO3=[0*i for i in s.O3]
     dO3=np.array(dO3)
 
     print("Starting main time loop (file {})".format(j))
-    startTime = time()
 
-    while s.totaltime < s.tEnd:
+    while s.totaltime.total_seconds() < s.runTime:
+        ##### Main time loop #####
+        if s.totaltime.total_seconds() % s.dtprint == 0:
+            #Print time stamp to screen
+            iError = s.printMessage()
 
-        if s.totaltime % s.dtprint == 0:
-            elapsedTime = time() - startTime
-            print("istep: {}; run time: {}hr; elapsed time: {:03.1f}s".format(s.istep,s.totaltime/3600.,elapsedTime))
+        #get updated irradiance values
+        # pdb.set_trace()
+        # Ftoa = photo.getIrradiance()
 
         # ATMOSPHERIC LAYERS
         tau = [0.0]*len(s.wavelengthLow)
@@ -135,7 +137,7 @@ for f in files:
 
             y =\
             chemistry.calcChemistry(density,PhotoDissRate,s.N[iAlt],
-                s.Temperature[iAlt],inputs.tstep,\
+                s.Temperature[iAlt],inputs.tstep.total_seconds(),\
                 chemsolver=inputs.chemsolver,\
                 iAlt=iAlt)
 
@@ -150,13 +152,13 @@ for f in files:
                 print('----iAlt: {}'.format(iAlt))
                 pdb.set_trace()
 
+        iError
         s.totaltime += inputs.tstep
         s.istep += 1
 
-        if s.totaltime % inputs.dtOut < inputs.tstep:
-            print("Writing output at {:6.1f}h".format(s.totaltime/3600.))
+        if s.totaltime.total_seconds() % inputs.dtOut <\
+            inputs.tstep.total_seconds():
             iError = output.output()
-            
 
-    print("Completed in istep: {}; run time: {}s; elapsed time: {:03.1f}s".format(s.istep,s.totaltime,elapsedTime))
-    print('{:g}'.format(max(s.O3)))
+
+    iError = s.finalize()

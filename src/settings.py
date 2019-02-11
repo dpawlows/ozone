@@ -7,6 +7,7 @@ from astropy import constants as const
 from astropy import units as u
 from matplotlib import pyplot as pp
 import numpy as np
+from time import time
 
 def init():
     """Initialize global variables including altitude and
@@ -26,15 +27,18 @@ def init():
     global N, O3, N2, O, P, NO
     global PhotoSpecies, PhotoDissociationCrosssections
     global iPhotoO2,iPhotoO3,iPhotoNO2, nPhotoSpecies
-    global istep, dtprint, tEnd, totaltime
+    global istep, dtprint, runTime, totaltime, startTime
     global nSecondsInDay, nSecoundsInHour, nSecondsInMinute
-    global density, sza
+    global density, sza, irradiance, irradianceTime
 
+
+    startTime = time()
     dtprint = 3600
     istep = 0
     nSecondsInDay = 86400
     nSecoundsInHour = 3600
     nSecondsInMinute = 60
+
 
     Altitude,Temperature= np.loadtxt('input/ustspline.txt',\
      usecols=(0,1), unpack=True)
@@ -89,4 +93,17 @@ def init():
         'protonmass' : const.m_p.cgs.value,#g
     }
 
+    return 0
+
+def printMessage():
+    elapsedTime = time() - startTime
+    print("istep: {}; run time: {}hr; elapsed time: {:03.1f}s".\
+    format(istep,totaltime.total_seconds()/3600.,elapsedTime))
+    return 0
+
+def finalize():
+    elapsedTime = time() - startTime
+    print("Completed in istep: {}; run time: {}s; elapsed time:\
+     {:03.1f}s".format(istep,totaltime,elapsedTime))
+    print('{:g}'.format(max(O3)))
     return 0

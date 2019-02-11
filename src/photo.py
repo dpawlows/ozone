@@ -5,10 +5,12 @@ cross sections.
 
 import settings as s
 import numpy as np
+from scipy import interpolate
 from matplotlib import pyplot as pp
 from glob import glob
 import inputs
 import pdb
+from datetime import datetime
 
 def blackbody_nu(in_x, temperature):
     """Calculate blackbody flux per steradian, :math:`B_{\\nu}(T)`.
@@ -197,7 +199,7 @@ def getPhotoCrosssections():
         message = ""
     return iError,message
 
-def getIrradiance():
+def initIrradiance():
     '''Integrate the irradiance to the bins specified in settings
 
     '''
@@ -205,9 +207,64 @@ def getIrradiance():
     #and units are .../nm, so the sum is the same as the integral
 
     irradianceFile = inputs.photoFile
-    wave,tempirradiance = \
-        np.loadtxt(irradianceFile, usecols=(0,1),\
-        delimiter=",",unpack=True)
+    f = open(irradianceFile,'r')
+
+    irradiancefound = False
+    s.irradianceTime = []
+    tempirradiance = []
+    i = 0
+    for line in f:
+        if irradiancefound:
+                temp = line.split()
+                year = int(temp[0])
+                mon = int(temp[1])
+                day = int(temp[2])
+                hour = int(temp[3])
+                min = int(temp[4])
+                seco = int(temp[5])
+
+                tempirr = [float(irr) for irr in temp[6:]]
+                if len(tempirr) != nInputWavelengths:
+                    print("Issue reading irradiance file")
+                    print("Inconsistent number of irradiance bins")
+                    print("Exiting...")
+                    exit(1)
+
+                s.irradianceTime.append(datetime(year,mon,day,hour,\
+                    min,seco))
+                tempirradiance.append(tempirr)
+
+        if line[0:7] == "#HEADER":
+            temp = f.readline()
+            t = temp.split(":")
+            try:
+                nInputWavelengths = int(t[1])
+                inputWavelengths = np.zeros((nInputWavelengths))
+            except:
+                print("Issue reading nInputWavelengths in \
+                    irradiance file")
+                exit(1)
+
+        if line[0:5] == "#WAVE":
+            temp = f.readline()
+            t = temp.split()
+            try:
+                inputWavelengths = [float(wv) for wv in t]
+            except:
+                print("Issue reading inputWavelengths in \
+                    irradiance file")
+                exit(1)
+
+        if line[0:11] == "#IRRADIANCE":
+            irradiancefound = True
+
+        i += 1
+        if i > 1000 and not irradiancefound:
+            print("Issue reading irradiance file")
+            print("Can't locate #IRRADIANCE")
+            exit(1)
+
+    nIrradianceTimes = len(s.irradianceTime)
 
     wl = s.wavelengthLow
     wh = s.wavelengthHigh
@@ -217,37 +274,56 @@ def getIrradiance():
         print('----Error: New bins are not compatible in getAverageSigmas')
         exit(1)
 
-    irradiance = []
+    irradiance = np.zeros((nIrradianceTimes,len(wl)))
+
 
     for i in range(len(wl)):
         try:
-            indexl = next(data[0] for data in enumerate(wave)\
+            indexl = next(data[0] for data in\
+                enumerate(inputWavelengths)\
                 if data[1] >= wl[i] and data[1] < wh[i])
         except:
             indexl = None
 
         try:
-            indexh = next(data[0] for data in enumerate(wave)\
+            indexh = next(data[0] for data in \
+            enumerate(inputWavelengths)\
                 if data[1] >= wh[i])
         except:
             indexh = None
 
         #We have the indices, now fill the irradiancebins
-        ###We are cheating here and not integrating since the integral
-        ###is equal to the sum!!
-        if indexl == None:
-            #no available data
-            irradiance.append(0)
-        elif indexh == None:
-            #Data available for part of the specified spectral range
-            irradiance.append(np.sum(tempirradiance[indexl:]))
+        #Integrate when necessary
+        for itime in range(nIrradianceTimes):
+            if indexl == None:
+                #no available data
+                irradiance[itime,i] = 0
+            elif indexh == None:
+                #Data available for part of the specified spectral
+                #range
+                irradiance[itime,i] =\
+                    np.trapz(tempirradiance[itime][indexl:],\
+                    inputWavelengths[indexl:])
 
-        elif indexh-1 == indexl:
-            irradiance.append(tempirradiance[indexl])
+            elif indexh-1 == indexl:
+                irradiance[itime,i] = tempirradiance[itime][indexl]
 
-        else:
-            irradiance.append(np.sum(tempirradiance[indexl:indexh-1]))
-            #Data available beyond the range
+            else:
+                #Data available beyond the range
+                irradiance[itime,i] =\
+                    np.trapz(tempirradiance[itime][indexl:indexh-1],
+                        inputWavelengths[indexl:indexh-1])
 
 
+    # pdb.set_trace()
     return irradiance
+
+def getIrradiance():
+    timediff = np.array([(it-inputs.startTime).total_seconds()\
+     for it in s.irradianceTime])
+    f = interpolate.interp1d(timediff-timediff[0],s.irradiance,0)
+    thisirradiance = f(s.totaltime.total_seconds())
+
+    pdb.set_trace()
+
+    return(thisirradiance)

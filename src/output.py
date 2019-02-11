@@ -1,18 +1,19 @@
 """Methods related to producing model output"""
 import settings as s
-
+import pdb
 def output(type=None):
     """Output to file.  Currently only option is to output
     all major species at all
     altitudes.
     """
-    days, remainder = divmod(s.totaltime,s.nSecondsInDay)
+    print("Writing output at {:6.1f}h".\
+        format(s.totaltime.total_seconds()/3600.))
+    days, remainder = divmod(s.totaltime.total_seconds(),s.nSecondsInDay)
     hours, remainder = divmod(remainder, s.nSecoundsInHour)
     minutes, seconds = divmod(remainder, s.nSecondsInMinute)
     cTime = \
      "output{:05d}_{:02d}{:02d}{:02d}".format(int(days),\
      int(hours),int(minutes),int(seconds))
-
     file = "data/{}.dat".format(cTime)
     try:
         outfile = open(file,'w')

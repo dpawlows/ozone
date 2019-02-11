@@ -7,6 +7,8 @@ import settings as s
 import pdb
 from matplotlib import pyplot as pp
 import inputs
+from photo import initIrradiance
+from datetime import timedelta
 
 def log_interp1d(xx, yy, kind='linear',fill_value=''):
     """Perform log interpolation in 1D
@@ -86,6 +88,9 @@ def initializeAtmosphere(f):
 
     input_data = inputs.readInputData(f)
 
+    timediff = inputs.endTime - inputs.startTime
+    s.runTime = timediff.total_seconds()
+
     Pressure=[0*i for i in s.Temperature]
     nDensity=[0*i for i in s.Temperature]
     #Build up background atmosphere
@@ -101,7 +106,6 @@ def initializeAtmosphere(f):
     s.R_pl=inputs.rPlanet*s.consts['R_earth']
     s.M_pl=inputs.massPlanet*s.consts['M_earth']
     s.tstar=inputs.tStar
-    s.tEnd = inputs.tEnd*86400.
     s.g=s.consts['G']*s.M_pl/s.R_pl/s.R_pl #cm s-2
     Hsca=(s.consts['k_B']*np.mean(s.Temperature)/(mu*  \
         s.consts['protonmass']*s.g))#cm
@@ -119,6 +123,8 @@ def initializeAtmosphere(f):
     s.NO =[1e9]*len(s.Altitude)
     s.OH = getOHComposition(s.Altitude)
 
+    s.totaltime=timedelta(seconds=0)
+    s.irradiance = initIrradiance()
 
 
     return 0

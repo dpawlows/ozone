@@ -5,8 +5,10 @@ from srcOutput import readOutput
 from matplotlib import pyplot as pp
 import datetime
 import matplotlib.dates as mdates
+import os
 
-files = glob.glob("data/*dat")
+newfiles = glob.glob("data/*dat")
+files = sorted( newfiles, key = lambda file: os.path.getctime(file))
 outputPlotDir = ("data/plots/")
 nfiles = len(files)
 if nfiles < 1:

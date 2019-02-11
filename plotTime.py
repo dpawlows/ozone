@@ -5,8 +5,10 @@ from srcOutput import readOutput
 from matplotlib import pyplot as pp
 import datetime
 import matplotlib.dates as mdates
+import os
 
-files = glob.glob("data/*dat")
+newfiles = glob.glob("data/*dat")
+files = sorted( newfiles, key = lambda file: os.path.getctime(file))
 outputPlotDir = ("data/plots/")
 nfiles = len(files)
 if nfiles < 1:
@@ -54,8 +56,6 @@ for file in files:
     minutes=mins,seconds=secs))
 
 time = [t.days*24+t.seconds/3600. for t in time]
-
-
 fig=pp.figure()
 ax = fig.add_subplot(221)
 pp.tight_layout()

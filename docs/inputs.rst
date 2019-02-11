@@ -19,12 +19,29 @@ running the code.
 The amount of time in between successive outputs.  Output
 files are in ascii and stored in the data directory.
 
+**Required: #TSTART**::
+
+  #TSTART
+  year
+  month
+  day
+  hour 
+  minute
+  second
+
+The end time of the simulation
+
 **Required: #TEND**::
 
   #TEND
-  ndays
+  year
+  month
+  day
+  hour
+  minute
+  second
 
-The number of days to simulate.
+The end time of the simulation
 
 **Required: #TSTEP**::
 
