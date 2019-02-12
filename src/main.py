@@ -41,17 +41,19 @@ for f in files:
 
     #Set irraidiance based on data or blackbody
     if inputs.usePhotoData:
-        flnew = s.irradiance
-        flnew = flnew[0,:]
-        for iWave in range(len(s.wavelengthLow)):
-            PhotonEnergy = 6.626e-34*2.998e8 /  \
-            ((s.wavelengthLow[iWave]+s.wavelengthHigh[iWave])/ \
-            2.*1.0e-9)
-
-            #W/m2/nm to Photons/s/cm2/nm
-            flnew[iWave] =  flnew[iWave]/PhotonEnergy/100.0**2
-
-        Ftoa = flnew
+        # flnew = s.irradiance.copy()
+        # flnew = flnew[0,:]
+        # # flnew = np.zeros((len(s.wavelengthLow)))
+        # for iWave in range(len(s.wavelengthLow)):
+        #     PhotonEnergy = 6.626e-34*2.998e8 /  \
+        #     ((s.wavelengthLow[iWave]+s.wavelengthHigh[iWave])/ \
+        #     2.*1.0e-9)
+        #
+        #     #W/m2/nm to Photons/s/cm2/nm
+        #     flnew[iWave] =  flnew[iWave]/PhotonEnergy/100.0**2
+        #
+        # Ftoa = flnew
+        pass
 
     else:
         wavelengths = []
@@ -98,8 +100,7 @@ for f in files:
             iError = s.printMessage()
 
         #get updated irradiance values
-        # pdb.set_trace()
-        # Ftoa = photo.getIrradiance()
+        Ftoa = photo.getIrradiance()
 
         # ATMOSPHERIC LAYERS
         tau = [0.0]*len(s.wavelengthLow)

@@ -321,9 +321,23 @@ def initIrradiance():
 def getIrradiance():
     timediff = np.array([(it-inputs.startTime).total_seconds()\
      for it in s.irradianceTime])
-    f = interpolate.interp1d(timediff-timediff[0],s.irradiance,0)
-    thisirradiance = f(s.totaltime.total_seconds())
+    f = interpolate.interp1d(timediff-timediff[0],\
+        s.irradiance,axis=0)
+    try:
+        thisirradiance = f(s.totaltime.total_seconds())
+    except ValueError:
+        print("Error in getIrradiance")
+        print("Values specified in irradiance file does not encompass simulation time")
+        print("Exiting...")
+        exit(1)
+    for iWave in range(len(s.wavelengthLow)):
+        PhotonEnergy = 6.626e-34*2.998e8 /  \
+        ((s.wavelengthLow[iWave]+s.wavelengthHigh[iWave])/ \
+        2.*1.0e-9)
 
-    pdb.set_trace()
+        #W/m2/nm to Photons/s/cm2/nm
+        thisirradiance[iWave] =  thisirradiance[iWave] \
+            /PhotonEnergy/(100.0**2)
+
 
     return(thisirradiance)
