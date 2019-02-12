@@ -1,5 +1,6 @@
 data
 eom.py
 __pycache__
+*.png
 input/input000.inp
 temp.py
