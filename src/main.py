@@ -23,64 +23,17 @@ path_input="input/"
 files=glob.glob(path_input+"*.inp")
 iError = s.init()
 sza = 0
-j=0
+iFile = 0
 for f in files:
-    j=j+1
-
-    #Specify scaling for photo crosssections.
-    phiO2_200=1.
-    phiO2_400=0.
-    phiO3_200=1.
-    phiO3_400=1.
-    phiNO2_200 = 1.
-    phiNO2_400 = 1
+    iFile = iFile+1
 
     #Initialize globals
     iError = initAtmosphere.initializeAtmosphere(f)
     iError = photo.getPhotoCrosssections()
 
-    #Set irraidiance based on data or blackbody
-    if inputs.usePhotoData:
-        # flnew = s.irradiance.copy()
-        # flnew = flnew[0,:]
-        # # flnew = np.zeros((len(s.wavelengthLow)))
-        # for iWave in range(len(s.wavelengthLow)):
-        #     PhotonEnergy = 6.626e-34*2.998e8 /  \
-        #     ((s.wavelengthLow[iWave]+s.wavelengthHigh[iWave])/ \
-        #     2.*1.0e-9)
-        #
-        #     #W/m2/nm to Photons/s/cm2/nm
-        #     flnew[iWave] =  flnew[iWave]/PhotonEnergy/100.0**2
-        #
-        # Ftoa = flnew
-        pass
-
-    else:
-        wavelengths = []
-        for i in range(len(s.wavelengthLow)):
-            wavelengths.append(s.wavelengthLow[i])
-            wavelengths.append(s.wavelengthHigh[i])
-
-        wavelengths = wavelengths*u.nm
-        pdb.set_trace()
-        flux_lam = photo.blackbody_lambda(wavelengths, s.tstar)
-        fl=flux_lam.to(u.W / u.nm / u.m**2  / u.sr)
-        fl=fl*(s.R_star/s.D_pl)**2*u.sr*3.1415
-
-        # # NORMALIZATION FACTOR
-        fl[0:1]=fl[0:1]/10. #For Earth since BB isn't perfect
-
-        phfl=fl*wavelengths/const.h.decompose()/const.c
-        phfl=phfl.decompose()
-        phfl=phfl.to(1/u.s/u.cm**2/u.nm)
-
-        phfl200=(phfl[0]+phfl[1])/2.*(wavelengths[1]-wavelengths[0])
-        phfl400=(phfl[2]+phfl[3])/2.*(wavelengths[3]-wavelengths[2])
-
-        Ftoa200=phfl200.value
-        Ftoa400=phfl400.value
-        Ftoa = [Ftoa200,Ftoa400]
-
+    if not usePhotoData:
+        #If irraidiance is not specified, calculate BB profile
+        Ftoa = photo.getBBspectrum()
 
     maxdiffarr=[]
     diffarr=[]
@@ -91,7 +44,7 @@ for f in files:
     dO3=[0*i for i in s.O3]
     dO3=np.array(dO3)
 
-    print("Starting main time loop (file {})".format(j))
+    print("Starting main time loop (file {})".format(iFile))
 
     while s.totaltime.total_seconds() < s.runTime:
         ##### Main time loop #####
@@ -100,7 +53,8 @@ for f in files:
             iError = s.printMessage()
 
         #get updated irradiance values
-        Ftoa = photo.getIrradiance()
+        if inputs.usePhotoData:
+            Ftoa = photo.getIrradiance()
 
         # ATMOSPHERIC LAYERS
         tau = [0.0]*len(s.wavelengthLow)
