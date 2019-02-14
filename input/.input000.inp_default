@@ -1,25 +1,44 @@
-#RADIATIONPARAMETERS
-1.0
-0.21
-1
-5778
-1
-1.0
-1.0
-237.063219
+#ATMOSPHERE
+1.0         (P/PEarth)
+0.21        (O2 mixing ratio)
+
+#STAR
+5778        (Tstar)
+1           (rStar/rSun)
+
+#PLANET
+1.0         (AU)
+1.0         (rPlanet/rEarth)
+1.0         (mPlanet/mEarth)
+0.1         (Eccentricity)
+365.2425     (nDaysInYear)
+237.063219  (TPlanet)
+
+#TSTART
+2018
+01
+03
+01
+01
+00
 
 #TEND
-100   (days)
+2019
+01
+03
+00
+00
+00
 
 #DTOUT
 86400    (seconds)
 
 #USEPHOTODATA
 T
-input/sorce_ssi_l3.csv
+input/sorce_l3.dat
 
 #TSTEP
-900
+1200
 
 #CHEMISTRY
 simple    (simple or explicit <-- needs tiny time step!!)
