@@ -25,7 +25,7 @@ files are in ascii and stored in the data directory.
   year
   month
   day
-  hour 
+  hour
   minute
   second
 
@@ -48,8 +48,10 @@ The end time of the simulation
   #TSTEP
   nseconds
 
-The time step.  Currently, a time step larger than 900s should
-not be used.
+The time step.  Currently, a time step larger than 1200s should
+not be used.  However, the time step depends on the irradiance
+specified in the model.  Testing should be done when varying
+the irradiance to determine the appropriate time step.
 
 .. _photodata:
 
@@ -67,23 +69,36 @@ If F, EOM assumes blackbody and calculates the irradiance
 based on the parameters set using the #RADIATIONPARAMETERS flag
 and the irradiance file is ignored.
 
-**Required: #RADIATIONPARAMETERS**::
+**Required: #ATMOSPHERE**::
 
-  #RADIATIONPARAMETERS
+  #ATMOSPHERE
   Pressure/Pressure_Earth
   O2MixingRatio
+
+
+Specifies fundamental values used for setting up the background
+atmosphere.
+
+**Required: #STAR**::
+
+  #STAR
   Rstar/Rsun
   Tstar
-  planetDistance/1AU
+
+**Required: #PLANET**::
+
+  #PLANET
+  planetDistanceAU
   rPlanet/rEarth
   mPlanet/mEarth
+  eccentricity
+  nDaysInYear
   T_effective
 
-Specifies basics of the planet, including fundamental values used
-for setting up the background atmosphere and radiation environment.
-Note that several of these are normalized values (e.g. a value of
-1 for mPlanet/mEarth means the simulated planet has the same mass as
-Earth).
+Fundamental parameters to set up the radiation environment
+and determine orbital distance.  Note: if the irradiance is
+specified at the top of the atmosphere, an eccentricity of
+1 should be used.
 
 **Required: #CHEMSOLVER**::
 
