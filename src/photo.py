@@ -9,6 +9,10 @@ from scipy import interpolate
 from matplotlib import pyplot as pp
 from glob import glob
 import inputs
+import orbit
+from astropy import units as u
+import photo
+from astropy import constants as const
 import pdb
 from datetime import datetime
 
@@ -201,124 +205,125 @@ def getPhotoCrosssections():
 
 def initIrradiance():
     '''Integrate the irradiance to the bins specified in settings
-
     '''
     #Note that the file gives values at 1nm resolution,
     #and units are .../nm, so the sum is the same as the integral
 
-    irradianceFile = inputs.photoFile
-    f = open(irradianceFile,'r')
+    if inputs.usePhotoData:
+        irradianceFile = inputs.photoFile
+        f = open(irradianceFile,'r')
 
-    irradiancefound = False
-    s.irradianceTime = []
-    tempirradiance = []
-    i = 0
-    for line in f:
-        if irradiancefound:
-                temp = line.split()
-                year = int(temp[0])
-                mon = int(temp[1])
-                day = int(temp[2])
-                hour = int(temp[3])
-                min = int(temp[4])
-                seco = int(temp[5])
+        irradiancefound = False
+        s.irradianceTime = []
+        tempirradiance = []
+        i = 0
+        for line in f:
+            if irradiancefound:
+                    temp = line.split()
+                    year = int(temp[0])
+                    mon = int(temp[1])
+                    day = int(temp[2])
+                    hour = int(temp[3])
+                    min = int(temp[4])
+                    seco = int(temp[5])
 
-                tempirr = [float(irr) for irr in temp[6:]]
-                if len(tempirr) != nInputWavelengths:
-                    print("Issue reading irradiance file")
-                    print("Inconsistent number of irradiance bins")
-                    print("Exiting...")
+                    tempirr = [float(irr) for irr in temp[6:]]
+                    if len(tempirr) != nInputWavelengths:
+                        print("Issue reading irradiance file")
+                        print("Inconsistent number of irradiance bins")
+                        print("Exiting...")
+                        exit(1)
+
+                    s.irradianceTime.append(datetime(year,mon,day,hour,\
+                        min,seco))
+                    tempirradiance.append(tempirr)
+
+            if line[0:7] == "#HEADER":
+                temp = f.readline()
+                t = temp.split(":")
+                try:
+                    nInputWavelengths = int(t[1])
+                    inputWavelengths = np.zeros((nInputWavelengths))
+                except:
+                    print("Issue reading nInputWavelengths in \
+                        irradiance file")
                     exit(1)
 
-                s.irradianceTime.append(datetime(year,mon,day,hour,\
-                    min,seco))
-                tempirradiance.append(tempirr)
+            if line[0:5] == "#WAVE":
+                temp = f.readline()
+                t = temp.split()
+                try:
+                    inputWavelengths = [float(wv) for wv in t]
+                except:
+                    print("Issue reading inputWavelengths in \
+                        irradiance file")
+                    exit(1)
 
-        if line[0:7] == "#HEADER":
-            temp = f.readline()
-            t = temp.split(":")
-            try:
-                nInputWavelengths = int(t[1])
-                inputWavelengths = np.zeros((nInputWavelengths))
-            except:
-                print("Issue reading nInputWavelengths in \
-                    irradiance file")
+            if line[0:11] == "#IRRADIANCE":
+                irradiancefound = True
+
+            i += 1
+            if i > 1000 and not irradiancefound:
+                print("Issue reading irradiance file")
+                print("Can't locate #IRRADIANCE")
                 exit(1)
 
-        if line[0:5] == "#WAVE":
-            temp = f.readline()
-            t = temp.split()
-            try:
-                inputWavelengths = [float(wv) for wv in t]
-            except:
-                print("Issue reading inputWavelengths in \
-                    irradiance file")
-                exit(1)
+        nIrradianceTimes = len(s.irradianceTime)
 
-        if line[0:11] == "#IRRADIANCE":
-            irradiancefound = True
+        wl = s.wavelengthLow
+        wh = s.wavelengthHigh
 
-        i += 1
-        if i > 1000 and not irradiancefound:
-            print("Issue reading irradiance file")
-            print("Can't locate #IRRADIANCE")
+
+        if len(wl) != len(wh):
+            print('----Error: New bins are not compatible in getAverageSigmas')
             exit(1)
 
-    nIrradianceTimes = len(s.irradianceTime)
-
-    wl = s.wavelengthLow
-    wh = s.wavelengthHigh
+        irradiance = np.zeros((nIrradianceTimes,len(wl)))
 
 
-    if len(wl) != len(wh):
-        print('----Error: New bins are not compatible in getAverageSigmas')
-        exit(1)
+        for i in range(len(wl)):
+            try:
+                indexl = next(data[0] for data in\
+                    enumerate(inputWavelengths)\
+                    if data[1] >= wl[i] and data[1] < wh[i])
+            except:
+                indexl = None
 
-    irradiance = np.zeros((nIrradianceTimes,len(wl)))
-
-
-    for i in range(len(wl)):
-        try:
-            indexl = next(data[0] for data in\
+            try:
+                indexh = next(data[0] for data in \
                 enumerate(inputWavelengths)\
-                if data[1] >= wl[i] and data[1] < wh[i])
-        except:
-            indexl = None
+                    if data[1] >= wh[i])
+            except:
+                indexh = None
 
-        try:
-            indexh = next(data[0] for data in \
-            enumerate(inputWavelengths)\
-                if data[1] >= wh[i])
-        except:
-            indexh = None
+            #We have the indices, now fill the irradiancebins
+            #Integrate when necessary
+            for itime in range(nIrradianceTimes):
+                if indexl == None:
+                    #no available data
+                    irradiance[itime,i] = 0
+                elif indexh == None:
+                    #Data available for part of the specified spectral
+                    #range
+                    irradiance[itime,i] =\
+                        np.trapz(tempirradiance[itime][indexl:],\
+                        inputWavelengths[indexl:])
 
-        #We have the indices, now fill the irradiancebins
-        #Integrate when necessary
-        for itime in range(nIrradianceTimes):
-            if indexl == None:
-                #no available data
-                irradiance[itime,i] = 0
-            elif indexh == None:
-                #Data available for part of the specified spectral
-                #range
-                irradiance[itime,i] =\
-                    np.trapz(tempirradiance[itime][indexl:],\
-                    inputWavelengths[indexl:])
+                elif indexh-1 == indexl:
+                    irradiance[itime,i] = tempirradiance[itime][indexl]
 
-            elif indexh-1 == indexl:
-                irradiance[itime,i] = tempirradiance[itime][indexl]
-
-            else:
-                #Data available beyond the range
-                irradiance[itime,i] =\
-                    np.trapz(tempirradiance[itime][indexl:indexh-1],
-                        inputWavelengths[indexl:indexh-1])
+                else:
+                    #Data available beyond the range
+                    irradiance[itime,i] =\
+                        np.trapz(tempirradiance[itime][indexl:indexh-1],
+                            inputWavelengths[indexl:indexh-1])
 
 
-    # pdb.set_trace()
     return irradiance
 
-def getIrradiance():
+def getIrradianceData():
+    """Get irradiance based on data in file specified in
+    input file."""
     timediff = np.array([(it-inputs.startTime).total_seconds()\
      for it in s.irradianceTime])
     f = interpolate.interp1d(timediff-timediff[0],\
@@ -343,27 +348,57 @@ def getIrradiance():
     return(thisirradiance)
 
 def getBBspectrum():
+    """Get blackbody irradiance based on parameters in
+    input file."""
     wavelengths = []
     for i in range(len(s.wavelengthLow)):
         wavelengths.append(s.wavelengthLow[i])
         wavelengths.append(s.wavelengthHigh[i])
 
     wavelengths = wavelengths*u.nm
-    pdb.set_trace()
     flux_lam = photo.blackbody_lambda(wavelengths, s.tstar)
     fl=flux_lam.to(u.W / u.nm / u.m**2  / u.sr)
     fl=fl*(s.R_star/s.D_pl)**2*u.sr*3.1415
 
     # # NORMALIZATION FACTOR
-    fl[0:1]=fl[0:1]/10. #For Earth since BB isn't perfect
-
+    #fl[0:1]=fl[0:1]/10. #For Earth since BB isn't perfect
     phfl=fl*wavelengths/const.h.decompose()/const.c
     phfl=phfl.decompose()
     phfl=phfl.to(1/u.s/u.cm**2/u.nm)
 
-    phfl200=(phfl[0]+phfl[1])/2.*(wavelengths[1]-wavelengths[0])
-    phfl400=(phfl[2]+phfl[3])/2.*(wavelengths[3]-wavelengths[2])
+    Ftoa = []
+    for i in range(len(s.wavelengthLow)):
+        j = i*2
+        Ftoa.append(((phfl[j]+phfl[j+1])/2.*\
+            (s.wavelengthHigh[i]-s.wavelengthLow[i])).value)
 
-    Ftoa200=phfl200.value
-    Ftoa400=phfl400.value
-    Ftoa = [Ftoa200,Ftoa400]
+    return Ftoa
+
+def scaleIrradiance(irr):
+    """Scales the irradiance based on the orbital distance."""
+
+    s.orbitalDistance = orbit.getOrbitalDistance()
+
+    printdistance = False
+    if printdistance and \
+        (s.runTime - inputs.startTime).total_seconds() % \
+        s.dtprint == 0:
+
+        f=open("distance.dat",'a+')
+        f.write("{:5.2f}  {}\n".format((s.runTime - \
+         inputs.startTime).total_seconds()/86400.,s.orbitalDistance))
+        f.close()
+
+    return irr*inputs.distancePlanet**2/s.orbitalDistance**2
+
+def getIrradiance():
+    """Wrapper function to pull irradiance data using method
+    specified in input file"""
+    if inputs.usePhotoData:
+        irradiance = getIrradianceData()
+    else:
+        irradiance = getBBspectrum()
+
+
+    irradiance = scaleIrradiance(irradiance)
+    return irradiance

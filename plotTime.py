@@ -27,7 +27,7 @@ for line in f:
         print('{}: {}'.format(i,altitude[i]))
         i+=1
 
-    if line[0] == "#":
+    if line[0:4] == "#Alt":
         vars = line.strip("#").strip("\n").split("\t")
         started = True
 
@@ -41,9 +41,10 @@ iVar = int(input("Enter which variable to plot: "))
 
 time = []
 data = []
-
+dPlanet = []
 for file in files:
     temp,header = readOutput.readOutputFile(file)
+    dPlanet.append(float(header[-1].split("=")[1]))
     data.append(temp[iAlt,iVar])
     pos = file.find(".dat") - 12
     days = int(file[pos:pos+5])
@@ -56,10 +57,18 @@ for file in files:
     minutes=mins,seconds=secs))
 
 time = [t.days*24+t.seconds/3600. for t in time]
+plotDistance = True
 fig=pp.figure()
 ax = fig.add_subplot(221)
-pp.tight_layout()
 pp.plot(time,data)
-pp.xlabel("Time (hours)")
 pp.ylabel(vars[iVar])
+if plotDistance:
+    ax = fig.add_subplot(223)
+    pp.plot(time,dPlanet)
+    pp.ylabel("Planet Distance (AU)")
+    pp.xlabel("Time (hours)")
+else:
+    pp.tight_layout()
+    pp.xlabel("Time (hours)")
+
 pp.savefig('plot.png')

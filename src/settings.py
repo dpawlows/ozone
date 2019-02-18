@@ -7,7 +7,8 @@ from astropy import constants as const
 from astropy import units as u
 from matplotlib import pyplot as pp
 import numpy as np
-from time import time
+from datetime import datetime
+import time
 
 def init():
     """Initialize global variables including altitude and
@@ -24,21 +25,20 @@ def init():
     global NO2PhotoDissocationRate
     global cSpeciesNames, nWavelengths,wavelengthLow,wavelengthHigh
     global g, consts, Altitude, tstar, D_pl, R_pl, R_star
-    global N, O3, N2, O, P, NO
     global PhotoSpecies, PhotoDissociationCrosssections
     global iPhotoO2,iPhotoO3,iPhotoNO2, nPhotoSpecies
     global istep, dtprint, runTime, totaltime, startTime
     global nSecondsInDay, nSecoundsInHour, nSecondsInMinute
     global density, sza, irradiance, irradianceTime
+    global equinox,longitudeOfPerihelion,orbitalDistance
 
 
-    startTime = time()
+    startTime = time.time()
     dtprint = 3600
     istep = 0
     nSecondsInDay = 86400
     nSecoundsInHour = 3600
     nSecondsInMinute = 60
-
 
     Altitude,Temperature= np.loadtxt('input/ustspline.txt',\
      usecols=(0,1), unpack=True)
@@ -82,7 +82,6 @@ def init():
     br=2e-11
     usePhotoData = False
 
-
     consts = {'R_sun':const.R_sun.to(u.cm).value, #cm
         'R_earth':const.R_earth.to(u.cm).value, #cm
         'M_sun':const.M_sun.to(u.g).value ,#g
@@ -93,17 +92,25 @@ def init():
         'protonmass' : const.m_p.cgs.value,#g
     }
 
+    equinox = datetime(1990,3,20,21,19,0)
+
+    #True longitudeOfPerihelion doesn't work since we aren't
+    #doing a full ephemeris.  Instead, using longitude of January 3
+    #as calculated in the code, as this is when perihelion occurs.
+    longitudeOfPerihelion = 284.4 #102.94719 (true longofperi)
+
     return 0
 
-def printMessage():
-    elapsedTime = time() - startTime
+def printMessage(totaltime):
+    elapsedTime = time.time() - startTime
     print("istep: {}; run time: {}hr; elapsed time: {:03.1f}s".\
-    format(istep,totaltime.total_seconds()/3600.,elapsedTime))
+    format(istep,\
+        totaltime.total_seconds()/3600.,elapsedTime))
     return 0
 
-def finalize():
-    elapsedTime = time() - startTime
+def finalize(totaltime):
+    elapsedTime = time.time() - startTime
     print("Completed in istep: {}; run time: {}s; elapsed time:\
-     {:03.1f}s".format(istep,totaltime,elapsedTime))
+     {:03.1f}s".format(istep,totaltime.total_seconds(),elapsedTime))
     print('{:g}'.format(max(O3)))
     return 0

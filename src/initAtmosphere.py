@@ -88,9 +88,6 @@ def initializeAtmosphere(f):
 
     input_data = inputs.readInputData(f)
 
-    timediff = inputs.endTime - inputs.startTime
-    s.runTime = timediff.total_seconds()
-
     Pressure=[0*i for i in s.Temperature]
     nDensity=[0*i for i in s.Temperature]
     #Build up background atmosphere
@@ -124,7 +121,7 @@ def initializeAtmosphere(f):
     s.OH = getOHComposition(s.Altitude)
 
     s.totaltime=timedelta(seconds=0)
-    s.irradiance = initIrradiance()
-
+    if inputs.usePhotoData:
+        s.irradiance = initIrradiance()
 
     return 0

@@ -7,15 +7,13 @@ Created on Wed Aug 29 15:46:28 2018
 """
 import pdb
 import glob
-from astropy import constants as const
-from astropy import units as u
 import chemistry
-import photo
 import initAtmosphere
 import numpy as np
 import settings as s
 import inputs
 import output
+import photo
 from matplotlib import pyplot as pp
 
 
@@ -31,10 +29,6 @@ for f in files:
     iError = initAtmosphere.initializeAtmosphere(f)
     iError = photo.getPhotoCrosssections()
 
-    if not usePhotoData:
-        #If irraidiance is not specified, calculate BB profile
-        Ftoa = photo.getBBspectrum()
-
     maxdiffarr=[]
     diffarr=[]
     counter=0
@@ -46,15 +40,16 @@ for f in files:
 
     print("Starting main time loop (file {})".format(iFile))
 
-    while s.totaltime.total_seconds() < s.runTime:
+    while s.runTime < inputs.endTime:
         ##### Main time loop #####
-        if s.totaltime.total_seconds() % s.dtprint == 0:
+        if (s.runTime - inputs.startTime).total_seconds() % \
+            s.dtprint == 0:
             #Print time stamp to screen
-            iError = s.printMessage()
+
+            iError = s.printMessage(s.runTime-inputs.startTime)
 
         #get updated irradiance values
-        if inputs.usePhotoData:
-            Ftoa = photo.getIrradiance()
+        Ftoa = photo.getIrradiance()
 
         # ATMOSPHERIC LAYERS
         tau = [0.0]*len(s.wavelengthLow)
@@ -89,6 +84,8 @@ for f in files:
                             intensity *\
                             s.PhotoDissociationCrosssections[\
                             speciesIndex][iWave]
+            # if iAlt == 97:
+            #     print(PhotoDissRate[s.iO3])
 
             y =\
             chemistry.calcChemistry(density,PhotoDissRate,s.N[iAlt],
@@ -96,24 +93,24 @@ for f in files:
                 chemsolver=inputs.chemsolver,\
                 iAlt=iAlt)
 
+            
             s.O2[iAlt]=y[s.iO2]
             s.O3[iAlt]=y[s.iO3]
             s.O[iAlt]=y[s.iO]
 
             if s.O2[iAlt] < 0 or s.O[iAlt] < 0 or s.O3[iAlt] < 0:
                 print('---- ErrorNegative density in main...')
-                print('----Time: {}'.format(s.totaltime))
+                print('----Time: {}'.format(s.runTime))
                 print('----iStep: {}'.format(s.istep))
                 print('----iAlt: {}'.format(iAlt))
                 pdb.set_trace()
 
-        iError
-        s.totaltime += inputs.tstep
+        s.runTime += inputs.tstep
         s.istep += 1
 
-        if s.totaltime.total_seconds() % inputs.dtOut <\
-            inputs.tstep.total_seconds():
+        if (s.runTime - inputs.startTime).total_seconds() %\
+         inputs.dtOut < inputs.tstep.total_seconds():
             iError = output.output()
 
 
-    iError = s.finalize()
+    iError = s.finalize(s.runTime-inputs.startTime)

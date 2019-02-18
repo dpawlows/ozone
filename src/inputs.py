@@ -60,33 +60,63 @@ def readInputData(file):
     global usePhotoData, pressure, O2mixingratio, rPlanet
     global rStar, tStar, distancePlanet, massPlanet, tempPlanet
     global dtOut, tstep, tEnd, chemsolver, sza, photoFile
-    global startTime, endTime
+    global startTime, endTime, eccentricity,nDaysInYear
 
     f = open(file,'r')
 
     iError = 0
     for line in f:
-        if line.strip().strip().upper() == "#RADIATIONPARAMETERS":
-            pressure,iErr = readfloat(f)
-            iError = max(iError,iErr)
-            O2mixingratio,iErr = readfloat(f)
-            iError = max(iError,iErr)
-            rStar,iErr = readfloat(f)
-            iError = max(iError,iErr)
+        if line.strip().upper() == "#STAR":
             tStar,iErr = readfloat(f)
-            iError = max(iError,iErr)
+            iError += iErr
+            rStar,iErr = readfloat(f)
+            iError += iErr
+
+            if iError > 0:
+                print("Error in readInputData")
+                print("#STAR")
+                print("Float    (Temperature)")
+                print("Float    (r/rSun)")
+                exit(iError)
+
+        if line.strip().upper() == "#PLANET":
             distancePlanet,iErr = readfloat(f)
+            s.orbitalDistance = distancePlanet
             iError = max(iError,iErr)
             rPlanet,iErr = readfloat(f)
             iError = max(iError,iErr)
             massPlanet,iErr = readfloat(f)
             iError = max(iError,iErr)
+            eccentricity,iErr = readfloat(f)
+            iError = max(iError,iErr)
+            nDaysInYear,iErr = readfloat(f)
+            iError = max(iError,iErr)
+            s.nSecondsPerYear = nDaysInYear * 86400.
             tempPlanet,iErr = readfloat(f)
+            iError = max(iError,iErr)
+            if iError > 0:
+                print("Error in readInputData")
+                print("#PLANET")
+                print("Float        (distance/1AU)")
+                print("Float        (r/rEarth)")
+                print("Float        (m/mEarth)")
+                print("Float        (Temperature)")
+                print("float        (eccentricty)")
+                print("ndaysinyear  (eccentricty)")
+
+                exit(iError)
+
+        if line.strip().upper() == "#ATMOSPHERE":
+            pressure,iErr = readfloat(f)
+            iError = max(iError,iErr)
+            O2mixingratio,iErr = readfloat(f)
             iError = max(iError,iErr)
 
             if iError > 0:
                 print("Error in readInputData")
                 print("#RADIATIONPARAMETERS")
+                print("Float    (P/PEarth)")
+                print("Float    (O2mixingratio)")
                 exit(iError)
 
         if line.strip().upper() == "#DTOUT":
@@ -175,7 +205,9 @@ def readInputData(file):
                 exit(iError)
 
             startTime = datetime(syear,smonth,sday,\
-                sminute,sminute,ssecond)
+                shour,sminute,ssecond)
+            s.runTime = startTime
+
 
         if line.strip().upper() == "#TEND":
             syear,iError = readint(f)
