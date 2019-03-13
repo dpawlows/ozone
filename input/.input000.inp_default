@@ -3,42 +3,55 @@
 0.21        (O2 mixing ratio)
 
 #STAR
-5778        (Tstar)
-1           (rStar/rSun)
+3000        (Tstar)
+0.1819           (rStar/rSun)
 
 #PLANET
-1.0         (AU)
+0.0837        (AU)
 1.0         (rPlanet/rEarth)
 1.0         (mPlanet/mEarth)
-0.1         (Eccentricity)
-365.2425     (nDaysInYear)
-237.063219  (TPlanet)
+0      (Eccentricity)
+180.2425     (nDaysInYear)
+
+#TEMPERATURE
+equilibrium
+0.3
+.67
 
 #TSTART
 2018
 01
 03
-01
-01
+00
+00
 00
 
 #TEND
 2019
 01
-03
+13
 00
 00
 00
 
-#DTOUT
-86400    (seconds)
+#STEADYSTATE
+T
+0.0001
+
+#OUTPUT
+86400 (seconds)
+3
+ALL
+PHOTO
+USER
+
 
 #USEPHOTODATA
-T
+F
 input/sorce_l3.dat
 
 #TSTEP
-1200
+1800
 
 #CHEMISTRY
-simple    (simple or explicit <-- needs tiny time step!!)
+backwardEuler    (simple or explicit <-- needs tiny time step!!)
