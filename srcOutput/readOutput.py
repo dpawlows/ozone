@@ -1,4 +1,5 @@
 from numpy import array
+import pdb
 def readOutputFile(file):
     f = open(file,'r')
     data = []

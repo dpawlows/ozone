@@ -19,10 +19,12 @@ def getOrbitalDistance():
 
     #Perihelion occurs near Jan 3, so this angle is set
     #as s.longitudeOfPerihelion
-    theta = (theta - s.longitudeOfPerihelion)
-    if theta < 0:
-        theta += 360
+    s.orbitAngle = (theta - s.longitudeOfPerihelion)
+    if s.orbitAngle < 0:
+        s.orbitAngle += 360
 
-    distance = inputs.distancePlanet*(1-inputs.eccentricity**2)/ \
-        (1+inputs.eccentricity*cos(theta*pi/180.))
-    return distance
+    s.orbitalDistance = inputs.distancePlanet*(1-inputs.eccentricity**2)/ \
+        (1+inputs.eccentricity*cos(s.orbitAngle*pi/180.))
+
+
+    return 0

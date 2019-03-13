@@ -88,13 +88,14 @@ def initializeAtmosphere(f):
 
     input_data = inputs.readInputData(f)
 
-    Pressure=[0*i for i in s.Temperature]
-    nDensity=[0*i for i in s.Temperature]
+    Pressure=[0*i for i in s.initTemperature]
+    nDensity=[0*i for i in s.initTemperature]
     #Build up background atmosphere
     Pressure[-1]=inputs.pressure*1013250 #Barye
     #1 KPa = 1e5 Barye
 
-    nDensity[-1]=(Pressure[-1]/s.consts['k_B']/s.Temperature[-1])
+    nDensity[-1]=(Pressure[-1]/s.consts['k_B']/\
+        s.initTemperature[-1])
     #assume only O2 and N2
 
     mu=(32.*inputs.O2mixingratio+28.*(1.-inputs.O2mixingratio))
@@ -104,7 +105,8 @@ def initializeAtmosphere(f):
     s.M_pl=inputs.massPlanet*s.consts['M_earth']
     s.tstar=inputs.tStar
     s.g=s.consts['G']*s.M_pl/s.R_pl/s.R_pl #cm s-2
-    Hsca=(s.consts['k_B']*np.mean(s.Temperature)/(mu*  \
+
+    Hsca=(s.consts['k_B']*np.mean(s.initTemperature)/(mu*  \
         s.consts['protonmass']*s.g))#cm
 
     # valori planetari e stellari
@@ -119,9 +121,37 @@ def initializeAtmosphere(f):
     s.NO2 = getNOComposition(s.Altitude)
     s.NO =[1e9]*len(s.Altitude)
     s.OH = getOHComposition(s.Altitude)
-
     s.totaltime=timedelta(seconds=0)
+    # s.density = np.zeros((s.nLayers,s.nMajorSpecies))
+    s.density = np.array([s.O,s.O2,s.O3])
+
     if inputs.usePhotoData:
         s.irradiance = initIrradiance()
 
     return 0
+
+def checkDone(olddensity):
+    if inputs.doSteadyState:
+
+        maxdiff = np.max((s.density - olddensity)/olddensity)
+        s.difflist.pop(0)
+        s.difflist.append(maxdiff)
+
+        if maxdiff < inputs.steadyCondition:
+                done = True
+        else:
+            done = False
+            if s.difflist[-1] > np.mean(s.difflist) and \
+                s.istep > len(s.difflist):
+                print("Simulation may be diverging?")
+                print("Latest percent diff is greater than \
+                the mean of the last {} times.".format(len(maxdiff)))
+                print("Stopping...")
+                exit(1)
+    else:
+        if s.runTime > inputs.endTime:
+            done = True
+        else:
+            done = False
+
+    return done

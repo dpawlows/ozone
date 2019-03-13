@@ -61,7 +61,11 @@ def readInputData(file):
     global rStar, tStar, distancePlanet, massPlanet, tempPlanet
     global dtOut, tstep, tEnd, chemsolver, sza, photoFile
     global startTime, endTime, eccentricity,nDaysInYear
+    global doSteadyState, steadyCondition
+    global cOutputType,nOutputTypes
+    global temperatureScheme, tempScaleFactor, albedo,emission
 
+    temperatureScheme = ""
     f = open(file,'r')
 
     iError = 0
@@ -85,26 +89,52 @@ def readInputData(file):
             iError = max(iError,iErr)
             rPlanet,iErr = readfloat(f)
             iError = max(iError,iErr)
+            if rPlanet < 0.001:
+                iError += 1
             massPlanet,iErr = readfloat(f)
             iError = max(iError,iErr)
+            if massPlanet < 0.001:
+                iError += 1
             eccentricity,iErr = readfloat(f)
             iError = max(iError,iErr)
             nDaysInYear,iErr = readfloat(f)
             iError = max(iError,iErr)
             s.nSecondsPerYear = nDaysInYear * 86400.
-            tempPlanet,iErr = readfloat(f)
-            iError = max(iError,iErr)
+
             if iError > 0:
                 print("Error in readInputData")
                 print("#PLANET")
                 print("Float        (distance/1AU)")
                 print("Float        (r/rEarth)")
                 print("Float        (m/mEarth)")
-                print("Float        (Temperature)")
                 print("float        (eccentricty)")
-                print("ndaysinyear  (eccentricty)")
-
+                print("Int          (ndaysinyear)")
                 exit(iError)
+
+        if line.strip().upper() == "#TEMPERATURE":
+            temperatureScheme,iError = readchar(f)
+
+            if temperatureScheme.lower() == "scaled":
+                #Simple scaling based on position of planet
+                tempScaleFactor, iError = readfloat(f)
+
+            if temperatureScheme.lower() == "isothermal":
+                #isothermal...
+                temperature, iError = readfloat(f)
+                s.initTemperature = \
+                    [temperature for i in s.initTemperature]
+
+            if temperatureScheme.lower() == "equilibrium":
+                #calculate equilibrium temperature
+                albedo, iError = readfloat(f)
+                emission, iError = readfloat(f)
+
+            if iError > 0:
+                print("Error in readInputData")
+                print("#TEMPERATURE")
+                print("Issue with formatting.  See docs.")
+                exit(iError)
+
 
         if line.strip().upper() == "#ATMOSPHERE":
             pressure,iErr = readfloat(f)
@@ -119,13 +149,21 @@ def readInputData(file):
                 print("Float    (O2mixingratio)")
                 exit(iError)
 
-        if line.strip().upper() == "#DTOUT":
+        if line.strip().upper() == "#OUTPUT":
             dtOut,iError = readfloat(f)
-
+            nOutputTypes,iError = readint(f)
+            cOutputType = []
+            for i in range(nOutputTypes):
+                temp,iError = readchar(f)
+                cOutputType.append(temp)
             if iError > 0:
                 print("Error in readInputData")
-                print("#DTOUT")
+                print("#OUTPUT")
                 print("float (seconds)")
+                print("nOutputTypes")
+                print("outputtype1")
+                print("outputtype2")
+                print("...")
                 exit(iError)
 
         if line.strip().upper() == "#USEPHOTODATA":
@@ -157,13 +195,15 @@ def readInputData(file):
 
         if line.strip().upper() == "#CHEMISTRY":
             chemsolver,iError = readchar(f)
-            if  chemsolver != "simple" and chemsolver != "explicit":
+            if  chemsolver != "simple" and chemsolver != "explicit" \
+                and chemsolver != "backwardeuler":
                 iError = 1
+                print(chemsolver)
 
             if iError > 0:
                 print("Error in readInputData")
                 print("#CHEMISTRY")
-                print("simple or explicit (watch the time step for explicit!)")
+                print("simple, backwardEuler, explicit (watch the time step for explicit!)")
                 exit(iError)
 
         if line.strip().upper() == "#TSTART":
@@ -250,6 +290,25 @@ def readInputData(file):
             endTime = datetime(syear,smonth,sday,\
                 shour,sminute,ssecond)
 
+        if line.strip().upper() == "#STEADYSTATE":
+            doSteadyState,iError= readlogical(f)
+            if iError == 1:
+                print("Error in readInputData")
+                print("#STEADYSTATE")
+                print("logical")
+                exit(iError)
+            if doSteadyState:
+                #stop model if change is less than some percent
+                steadyCondition, iError = readfloat(f)
+
+                if iError == 1:
+                    print("Error in readInputData")
+                    print("#STEADYSTATE")
+                    print("logical")
+                    print("percentError")
+                    exit(iError)
+
+                doSteadStasteadyCondition = steadyCondition * 0.01
 
     f.close()
 

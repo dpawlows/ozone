@@ -9,7 +9,6 @@ from scipy import interpolate
 from matplotlib import pyplot as pp
 from glob import glob
 import inputs
-import orbit
 from astropy import units as u
 import photo
 from astropy import constants as const
@@ -377,8 +376,6 @@ def getBBspectrum():
 def scaleIrradiance(irr):
     """Scales the irradiance based on the orbital distance."""
 
-    s.orbitalDistance = orbit.getOrbitalDistance()
-
     printdistance = False
     if printdistance and \
         (s.runTime - inputs.startTime).total_seconds() % \
@@ -389,16 +386,35 @@ def scaleIrradiance(irr):
          inputs.startTime).total_seconds()/86400.,s.orbitalDistance))
         f.close()
 
+
     return irr*inputs.distancePlanet**2/s.orbitalDistance**2
 
 def getIrradiance():
     """Wrapper function to pull irradiance data using method
     specified in input file"""
     if inputs.usePhotoData:
-        irradiance = getIrradianceData()
+        irradiance = np.array(getIrradianceData())
     else:
-        irradiance = getBBspectrum()
+        irradiance = np.array(getBBspectrum())
 
 
     irradiance = scaleIrradiance(irradiance)
     return irradiance
+
+def updateTemperature():
+
+    if inputs.temperatureScheme.lower() == "scaled":
+        #scale temperature based on orbital position
+        s.Temperature = s.initTemperature * \
+        (1+inputs.tempScaleFactor * np.cos(s.orbitAngle*np.pi/180))
+    elif inputs.temperatureScheme.lower() == "isothermal":
+        #initTemperature is set to input temperature in inputs
+        s.Temperature = s.initTemperature
+    elif inputs.temperatureScheme.lower() == "equilibrium":
+        s.Temperature = [((2/(2-inputs.emission))*1367. * \
+        (1/s.orbitalDistance)**2*(inputs.tStar/5778.)**4 * \
+        inputs.rStar**2 * (1-inputs.albedo) /\
+        (8*s.consts['sigmaSB']))**(0.25) for t in s.initTemperature]
+
+    else:
+        s.Temperature = s.initTemperature

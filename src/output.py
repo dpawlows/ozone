@@ -2,39 +2,59 @@
 import settings as s
 import pdb
 import inputs
-def output(type=None):
-    """Output to file.  Currently only option is to output
-    all major species at all
-    altitudes.
+import user
+
+def output():
+    """Output to file based on output types specified in input file.
     """
-    print("Writing output at {:6.1f}h".\
-        format((s.runTime-inputs.startTime).total_seconds()/3600.))
-    days, remainder = \
-        divmod((s.runTime-inputs.startTime).total_seconds(),\
-        s.nSecondsInDay)
-    hours, remainder = divmod(remainder, s.nSecoundsInHour)
-    minutes, seconds = divmod(remainder, s.nSecondsInMinute)
-    cTime = \
-     "output{:05d}_{:02d}{:02d}{:02d}".format(int(days),\
-     int(hours),int(minutes),int(seconds))
-    file = "data/{}.dat".format(cTime)
-    try:
-        outfile = open(file,'w')
-    except:
-        print("----Error: Issue opening file {}".format(file))
-        print("----Does directory and file exist?")
-        exit(1)
-    outfile.write("#PlanetDistance: {:6.3f}\n".\
-        format(s.orbitalDistance))
-    outfile.write("#Alt\t[O2]\t[O]\t[O3]\n")
 
-    for iAlt in range(s.nLayers):
-        if iAlt == 97:
-            print(s.O3[iAlt])
-        outfile.write('{:05.2f}\t{:09.7e}\t{:09.7e}\t{:09.7e}\n'\
-            .format(s.Altitude[iAlt]/1e5,\
-            s.O2[iAlt],s.O[iAlt],s.O3[iAlt]))
+    for type in inputs.cOutputType:
+        print("Writing output type: {} at {:6.1f}h".\
+            format(type,(s.runTime-inputs.startTime).total_seconds()/3600.))
+        days, remainder = \
+            divmod((s.runTime-inputs.startTime).total_seconds(),\
+            s.nSecondsInDay)
+        hours, remainder = divmod(remainder, s.nSecoundsInHour)
+        minutes, seconds = divmod(remainder, s.nSecondsInMinute)
+        cTime = \
+         "{:05d}_{:02d}{:02d}{:02d}".format(int(days),\
+         int(hours),int(minutes),int(seconds))
+
+        file = "data/{}_{}.dat".format(type,cTime)
+        try:
+            outfile = open(file,'w')
+        except:
+            print("----Error: Issue opening file {}".format(file))
+            print("----Does directory and file exist?")
+            exit(1)
+
+        outfile.write("#PlanetDistance: {:6.3f}\n".\
+            format(s.orbitalDistance))
+
+        if type.lower() == "all":
+            outfile.write("#Alt\t[O]\t[O2]\t[O3]\n")
+
+            for iAlt in range(s.nLayers):
+
+                outfile.write('{:05.2f}\t'.format(s.Altitude[iAlt]/1e5))
+                outfile.write('\t'.join("{:09.7e}".format(d) for d \
+                    in s.density[:,iAlt]))
+                outfile.write('\n')
 
 
-    outfile.close()
+        if type.lower() == "photo":
+            outfile.write("#Alt\tJ(O2)\tJ(O3)\n")
+
+            for iAlt in range(s.nLayers):
+
+                outfile.write('{:05.2f}\t'.format(s.Altitude[iAlt]/1e5))
+                outfile.write('\t'.join("{:09.7e}".format(d) for d \
+                    in s.PhotoDissRate_Alt[:,iAlt]))
+                outfile.write('\n')
+
+        if type.lower() == "user":
+            s.userdata[0,:] = s.Altitude/1.0e5
+            iError = user.outputuser(outfile,s.userdata)
+
+        outfile.close()
     return 0

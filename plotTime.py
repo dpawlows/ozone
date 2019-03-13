@@ -3,14 +3,29 @@ import glob
 import pdb
 from srcOutput import readOutput
 from matplotlib import pyplot as pp
+import numpy as np
 import datetime
 import matplotlib.dates as mdates
 import os
 
-newfiles = glob.glob("data/*dat")
+datadir = input("Enter data directory: ")
+newfiles = glob.glob(datadir+"/*dat")
+filetypes = set([])
+for file in newfiles:
+    pos = file.rfind("/")+1
+    filetypes.add(file[pos:pos+5])
+filetypes = list(filetypes)
+filetypes.sort()
+
+for i in range(len(filetypes)):
+    print(i,filetypes[i])
+if len(filetypes) > 1:
+    itype = int(input("Enter which type of file to plot: "))
+    newfiles = glob.glob(datadir+"/"+filetypes[itype]+"*.dat")
+
 files = sorted( newfiles, key = lambda file: os.path.getctime(file))
-outputPlotDir = ("data/plots/")
 nfiles = len(files)
+
 if nfiles < 1:
     print("No files found!")
     exit(1)
@@ -36,8 +51,7 @@ f.close()
 for i in range(1,len(vars)):
     #skip altitude as an option
     print("{}: {}".format(i,vars[i]))
-
-iVar = int(input("Enter which variable to plot: "))
+iVar = int(input("Enter which variable to plot: (-1 for all)"))
 
 time = []
 data = []
@@ -45,7 +59,10 @@ dPlanet = []
 for file in files:
     temp,header = readOutput.readOutputFile(file)
     dPlanet.append(float(header[-1].split("=")[1]))
-    data.append(temp[iAlt,iVar])
+    if iVar < 0:
+        data.append(temp[iAlt,:])
+    else:
+        data.append(temp[iAlt,iVar])
     pos = file.find(".dat") - 12
     days = int(file[pos:pos+5])
     hours = int(file[pos+6:pos+8])
@@ -56,12 +73,21 @@ for file in files:
     time.append(datetime.timedelta(days=days,hours=hours,\
     minutes=mins,seconds=secs))
 
+data = np.array(data)
+
 time = [t.days*24+t.seconds/3600. for t in time]
 plotDistance = True
 fig=pp.figure()
 ax = fig.add_subplot(221)
-pp.plot(time,data)
-pp.ylabel(vars[iVar])
+if iVar < 0:
+    for i in range(1,len(vars)):
+        pp.plot(time,data[:,i],label=vars[i])
+    pp.ylabel(vars[1][0])
+
+else:
+    pp.plot(time,data)
+    pp.ylabel(vars[iVar])
+# pp.ylim([2.17e12,2.18e12])
 if plotDistance:
     ax = fig.add_subplot(223)
     pp.plot(time,dPlanet)
@@ -71,4 +97,4 @@ else:
     pp.tight_layout()
     pp.xlabel("Time (hours)")
 
-pp.savefig('plot.png')
+pp.savefig(datadir+'/plot.png')
