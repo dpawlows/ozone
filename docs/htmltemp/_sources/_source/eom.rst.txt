@@ -1,0 +1,7 @@
+eom module
+==========
+
+.. automodule:: eom
+    :members:
+    :undoc-members:
+    :show-inheritance:

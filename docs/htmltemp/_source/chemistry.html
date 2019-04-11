@@ -1,0 +1,192 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>chemistry module &#8212; EOM 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="initAtmosphere module" href="initAtmosphere.html" />
+    <link rel="prev" title="src" href="modules.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-chemistry">
+<span id="chemistry-module"></span><h1>chemistry module<a class="headerlink" href="#module-chemistry" title="Permalink to this headline">¶</a></h1>
+<p>Methods related to the actual chemical processes used
+in EOM</p>
+<dl class="function">
+<dt id="chemistry.backwardEuler">
+<code class="descclassname">chemistry.</code><code class="descname">backwardEuler</code><span class="sig-paren">(</span><em>density</em>, <em>PhotoDissRate</em>, <em>N</em>, <em>dt</em>, <em>iAlt</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.backwardEuler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the density using the backward euler method.
+Currently requires source and loss terms to be calculated
+and their derivatives.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chemistry.calcChemistry">
+<code class="descclassname">chemistry.</code><code class="descname">calcChemistry</code><span class="sig-paren">(</span><em>u0</em>, <em>PhotoDissRate</em>, <em>N</em>, <em>temp</em>, <em>dt</em>, <em>chemsolver='simple'</em>, <em>iAlt=None</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.calcChemistry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the chemistry update.</p>
+<p>The #CHEMISTRY input flag determines the method to use,
+simple or explicit.</p>
+<dl class="docutils">
+<dt>u0 <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd>Input density at a single altitude for all species</dd>
+<dt>PhotoDissRate <span class="classifier-delimiter">:</span> <span class="classifier">array</span></dt>
+<dd>Input photo dissociation rates for all photo active
+species</dd>
+<dt>N <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>Total number density at single altitude</dd>
+<dt>temp <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>Temperature at single altitude</dd>
+<dt>dt <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>Time step</dd>
+<dt>chemsolver <span class="classifier-delimiter">:</span> <span class="classifier">char, optional</span></dt>
+<dd>Specify which method to use to solve chemistry</dd>
+<dt>iAlt <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd>Mainly used for debugging</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="chemistry.calcJacobian">
+<code class="descclassname">chemistry.</code><code class="descname">calcJacobian</code><span class="sig-paren">(</span><em>density</em>, <em>PhotoDissRate</em>, <em>N</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.calcJacobian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="chemistry.calcsourceterms">
+<code class="descclassname">chemistry.</code><code class="descname">calcsourceterms</code><span class="sig-paren">(</span><em>u</em>, <em>PhotoDissRate</em>, <em>N</em>, <em>dt</em>, <em>ialt</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.calcsourceterms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the full time-dependent chemical sources and losses
+for the current time step explicitly.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chemistry.forthorder">
+<code class="descclassname">chemistry.</code><code class="descname">forthorder</code><span class="sig-paren">(</span><em>u0</em>, <em>PhotoDissRate</em>, <em>N</em>, <em>dt</em>, <em>iAlt</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.forthorder" title="Permalink to this definition">¶</a></dt>
+<dd><p>4th order Runge Kutta solver</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chemistry.func">
+<code class="descclassname">chemistry.</code><code class="descname">func</code><span class="sig-paren">(</span><em>u</em>, <em>PhotoDissRate</em>, <em>N</em>, <em>dt</em>, <em>ialt</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the full time-dependent chemistry
+for the current time step explicitly.  This function
+is only used if the #CHEMISTRY input flag is set to
+“explicit”.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="chemistry.updateRates">
+<code class="descclassname">chemistry.</code><code class="descname">updateRates</code><span class="sig-paren">(</span><em>temp</em><span class="sig-paren">)</span><a class="headerlink" href="#chemistry.updateRates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update chemical reaction rates given the temperature</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EOM</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gettingstarted.html#usage">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inputs.html">Inputs</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">chemistry module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="initAtmosphere.html">initAtmosphere module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inputs.html">inputs module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="output.html">output module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="photo.html">photo module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="settings.html">settings module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">src</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">src</a></li>
+      <li>Next: <a href="initAtmosphere.html" title="next chapter">initAtmosphere module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Eleonora Alei.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/_source/chemistry.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

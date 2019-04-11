@@ -418,3 +418,5 @@ def updateTemperature():
 
     else:
         s.Temperature = s.initTemperature
+
+    return 0

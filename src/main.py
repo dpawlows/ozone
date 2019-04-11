@@ -21,39 +21,46 @@ from matplotlib import pyplot as pp
 path_input="input/"
 files=glob.glob(path_input+"*.inp")
 iError = s.init()
-sza = 0
 iFile = 0
 for f in files:
     iFile = iFile+1
 
     #Initialize globals
-    iError = initAtmosphere.initializeAtmosphere(f)
-    iError = photo.getPhotoCrosssections()
+    iErr = initAtmosphere.initializeAtmosphere(f)
+    if iErr > 0:
+        s.stopEOM("Error in initializeAtmosphere")
+    iErr,message = photo.getPhotoCrosssections()
+    if iErr > 0:
+        s.stopEOM(message)
+
     PhotoDissRate_Alt = np.zeros((s.nPhotoSpecies,s.nLayers))
     oldDensity = np.copy(s.density)
 
     print("Starting main time loop (file {})".format(iFile))
     done = False
-
+    iErr = 0
     while not done:
         ##### Main time loop #####
         if (s.runTime - inputs.startTime).total_seconds() % \
             s.dtprint == 0:
             #Print time stamp to screen
-            iError = s.printMessage(s.runTime-inputs.startTime)
-
+            iErr += s.printMessage(s.runTime-inputs.startTime)
         #update orbit
-        iError = orbit.getOrbitalDistance()
-        iError = orbit.calcSZA()
+        iErr += orbit.getOrbitalDistance()
+        sza = orbit.getSZA()
 
         #get updated irradiance values
         Ftoa = photo.getIrradiance()
 
         #update Temperature
-        iError = photo.updateTemperature()
+        iErr += photo.updateTemperature()
+        if iErr > 0:
+            s.stopEOM("Error in main.")
 
         # ATMOSPHERIC LAYERS
         tau = [0.0]*len(s.wavelengthLow)
+
+
         for iAlt in range(0,len(s.Altitude)):
             PhotoDissRate = [0.0]*s.nPhotoSpecies
 
@@ -71,7 +78,7 @@ for f in files:
                             * (s.Altitude[iAlt-1]-s.Altitude[iAlt])
 
                 intensity = Ftoa[iWave] * \
-                    np.exp(-tau[iWave]/np.arccos(sza))
+                    np.exp(-tau[iWave]/np.cos(sza*np.pi/180.))
 
                 for species in s.PhotoSpecies:
                     speciesIndex = s.PhotoSpecies.index(species)
@@ -101,7 +108,7 @@ for f in files:
 
         s.runTime += inputs.tstep
         s.istep += 1
-        # pdb.set_trace()
+
         if (s.runTime - inputs.startTime).total_seconds() %\
          inputs.dtOut < inputs.tstep.total_seconds():
             iError = output.output()

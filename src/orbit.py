@@ -29,9 +29,13 @@ def getOrbitalDistance():
 
     return 0
 
-
+def getSZA():
+    return inputs.SZA
+    
 def calcSZA():
-
+    '''Calculate the sza based on position and time.
+    This feature is not complete.  Team decided to use
+    constant SZA.  Code remains for future implementation.'''
     time = 12*3600
 
     SunDeclination =  inputs.tilt*cos(360*\
@@ -48,7 +52,5 @@ def calcSZA():
         cosDec * cos(inputs.latitude*pi/180) * \
         cos(pi*(localTime - inputs.nHoursPerDay/2)/(inputs.nHoursPerDay/2)))
 
-    print(localTime,sza*180/pi)
-    pdb.set_trace()
 
     return 0

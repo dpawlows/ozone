@@ -64,25 +64,26 @@ def readInputData(file):
     global doSteadyState, steadyCondition
     global cOutputType,nOutputTypes
     global temperatureScheme, tempScaleFactor, albedo,emission
-    global latitude,longitude, tilt, nHoursPerDay
+    global latitude,longitude, tilt, nHoursPerDay, SZA
 
     temperatureScheme = ""
     f = open(file,'r')
 
     iError = 0
     for line in f:
-        if line.strip().upper() == "#LOCATION":
-            latitude,iErr = readfloat(f)
-            iError += iErr
-            longitude,iErr = readfloat(f)
-            iError += iErr
+        # Location option isn't currently used
+        # if line.strip().upper() == "#LOCATION":
+        #     latitude,iErr = readfloat(f)
+        #     iError += iErr
+        #     longitude,iErr = readfloat(f)
+        #     iError += iErr
 
-            if iError > 0:
-                print("Error in readInputData")
-                print("#LOCATION")
-                print("Float    (latitude)")
-                print("Float    (longitude)")
-                exit(iError)
+        # if iError > 0:
+        #     print("Error in readInputData")
+        #     print("#LOCATION")
+        #     print("Float    (latitude)")
+        #     print("Float    (longitude)")
+        #     exit(iError)
 
         if line.strip().upper() == "#STAR":
             tStar,iErr = readfloat(f)
@@ -114,10 +115,14 @@ def readInputData(file):
             eccentricity,iErr = readfloat(f)
             iError = max(iError,iErr)
             nDaysInYear,iErr = readfloat(f)
+            s.nSecondsPerYear = nDaysInYear * 86400.
             iError = max(iError,iErr)
-            nHoursPerDay,iError = readfloat(f)
+            SZA,iErrr = readfloat(f)
             iError = max(iError,iErr)
-            s.nSecondsPerYear = nDaysInYear * nHoursPerDay * 3600.
+
+            # nHoursPerDay,iError = readfloat(f)
+            # iError = max(iError,iErr)
+            # s.nSecondsPerYear = nDaysInYear * nHoursPerDay * 3600.
 
             if iError > 0:
                 print("Error in readInputData")
@@ -127,7 +132,9 @@ def readInputData(file):
                 print("Float        (m/mEarth)")
                 print("float        (eccentricty)")
                 print("float        (tilt, degrees)")
-                print("Int          (ndaysinyear)")
+                print("float        (ndaysinyear)")
+                print("float        (SZA)")
+
                 exit(iError)
 
         if line.strip().upper() == "#TEMPERATURE":

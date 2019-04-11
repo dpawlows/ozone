@@ -32,7 +32,7 @@ def init():
     global iPhotoO2,iPhotoO3,iPhotoNO2, nPhotoSpecies
     global istep, dtprint, runTime, totaltime, startTime
     global nSecondsInDay, nSecoundsInHour, nSecondsInMinute
-    global sza, irradiance, irradianceTime, orbitAngle
+    global irradiance, irradianceTime, orbitAngle
     global equinox,longitudeOfPerihelion,orbitalDistance
     global density, difflist, userdata,PhotoDissRate_Alt
     global nSecondsPerYear
@@ -128,3 +128,8 @@ def finalize(totaltime):
      {:03.1f}s".format(istep,totaltime.total_seconds(),elapsedTime))
     print('{:g}'.format(max(density[iO3,:])))
     return 0
+
+def stopEOM(message):
+    print(message+"\n")
+    print("Exitting...")
+    exit(1)

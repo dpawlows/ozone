@@ -1,0 +1,7 @@
+plotTime module
+===============
+
+.. automodule:: plotTime
+    :members:
+    :undoc-members:
+    :show-inheritance:
