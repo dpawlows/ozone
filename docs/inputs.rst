@@ -67,7 +67,8 @@ The end time of the simulation
 
 The time step.  The time step depends on the irradiance
 specified in the model and the chemical scheme used.
- Testing should be done when changing these things to determine the appropriate time step.  
+Testing should be done when changing these things to determine
+the appropriate time step.
 
 .. _photodata:
 
@@ -128,7 +129,7 @@ Simple chemical solver assumes photochemical equilibrium for certain
 species.  backwardEuler makes no such assumption and the Backward
 Euler implicit scheme is used.
 
-**Optional: #TEMPERATURE
+**Optional: #TEMPERATURE**::
 
   #TEMPERATURE
   scaled/isothermal/equilibrium/
@@ -157,7 +158,7 @@ Required parameters: 2
 albedo        float; surface albedo
 emmissivity    float; emmissivity (0.67 for Earth)
 
-**Optional: #STEADYSTATE
+**Optional: #STEADYSTATE**::
 
   #STEADYSTATE
   T/F               (logical)
