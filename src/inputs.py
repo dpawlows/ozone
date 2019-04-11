@@ -64,12 +64,26 @@ def readInputData(file):
     global doSteadyState, steadyCondition
     global cOutputType,nOutputTypes
     global temperatureScheme, tempScaleFactor, albedo,emission
+    global latitude,longitude, tilt, nHoursPerDay
 
     temperatureScheme = ""
     f = open(file,'r')
 
     iError = 0
     for line in f:
+        if line.strip().upper() == "#LOCATION":
+            latitude,iErr = readfloat(f)
+            iError += iErr
+            longitude,iErr = readfloat(f)
+            iError += iErr
+
+            if iError > 0:
+                print("Error in readInputData")
+                print("#LOCATION")
+                print("Float    (latitude)")
+                print("Float    (longitude)")
+                exit(iError)
+
         if line.strip().upper() == "#STAR":
             tStar,iErr = readfloat(f)
             iError += iErr
@@ -95,11 +109,15 @@ def readInputData(file):
             iError = max(iError,iErr)
             if massPlanet < 0.001:
                 iError += 1
+            tilt,iErr = readfloat(f)
+            iError = max(iError,iErr)
             eccentricity,iErr = readfloat(f)
             iError = max(iError,iErr)
             nDaysInYear,iErr = readfloat(f)
             iError = max(iError,iErr)
-            s.nSecondsPerYear = nDaysInYear * 86400.
+            nHoursPerDay,iError = readfloat(f)
+            iError = max(iError,iErr)
+            s.nSecondsPerYear = nDaysInYear * nHoursPerDay * 3600.
 
             if iError > 0:
                 print("Error in readInputData")
@@ -108,6 +126,7 @@ def readInputData(file):
                 print("Float        (r/rEarth)")
                 print("Float        (m/mEarth)")
                 print("float        (eccentricty)")
+                print("float        (tilt, degrees)")
                 print("Int          (ndaysinyear)")
                 exit(iError)
 
@@ -308,7 +327,7 @@ def readInputData(file):
                     print("percentError")
                     exit(iError)
 
-                doSteadStasteadyCondition = steadyCondition * 0.01
+                steadyCondition = steadyCondition * 0.01
 
     f.close()
 

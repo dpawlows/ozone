@@ -1,6 +1,6 @@
 import settings as s
 import inputs
-from numpy import cos, pi
+from numpy import cos, pi, sin, arctan, tan, arccos
 import pdb
 def getOrbitalDistance():
     """Get the orbital distance based on the simulation time
@@ -12,6 +12,7 @@ def getOrbitalDistance():
 
     #angle swept out since equinox
     theta = timediff*360/s.nSecondsPerYear
+
     if theta > 360:
         print("Error in orbit.py")
         print("Issue with orbit angle")
@@ -26,5 +27,28 @@ def getOrbitalDistance():
     s.orbitalDistance = inputs.distancePlanet*(1-inputs.eccentricity**2)/ \
         (1+inputs.eccentricity*cos(s.orbitAngle*pi/180.))
 
+    return 0
+
+
+def calcSZA():
+
+    time = 12*3600
+
+    SunDeclination =  inputs.tilt*cos(360*\
+        inputs.nDaysInYear*(nDaysSinceSolstice))
+
+    # arctan(tan(inputs.tilt*pi/180.)*\
+    #     sin(s.orbitAngle*pi/180.))
+
+    localTime = (time/3600.0 + (inputs.longitude*pi/180)*inputs.nHoursPerDay / (2*pi)) % \
+        inputs.nHoursPerDay
+    sinDec = sin(SunDeclination)
+    cosDec = cos(SunDeclination)
+    sza = arccos(sinDec*sin(inputs.latitude*pi/180) + \
+        cosDec * cos(inputs.latitude*pi/180) * \
+        cos(pi*(localTime - inputs.nHoursPerDay/2)/(inputs.nHoursPerDay/2)))
+
+    print(localTime,sza*180/pi)
+    pdb.set_trace()
 
     return 0

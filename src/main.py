@@ -44,6 +44,7 @@ for f in files:
 
         #update orbit
         iError = orbit.getOrbitalDistance()
+        iError = orbit.calcSZA()
 
         #get updated irradiance values
         Ftoa = photo.getIrradiance()

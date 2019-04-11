@@ -75,6 +75,9 @@ for file in files:
 
 data = np.array(data)
 
+ymin = float(input("Enter minimum to plot (0 for auto):"))
+ymax = float(input("Enter maximum to plot (0 for auto):"))
+
 time = [t.days*24+t.seconds/3600. for t in time]
 plotDistance = True
 fig=pp.figure()
@@ -87,6 +90,8 @@ if iVar < 0:
 else:
     pp.plot(time,data)
     pp.ylabel(vars[iVar])
+if ymin != 0 and ymax != 0:
+    pp.ylim([ymin,ymax])
 # pp.ylim([2.17e12,2.18e12])
 if plotDistance:
     ax = fig.add_subplot(223)

@@ -9,7 +9,7 @@ import numpy as np
 # from matplotlib import rc
 import os
 
-pp.rc('text', usetex=True)
+# pp.rc('text', usetex=True)
 datadir = input("Enter data directory: ")
 newfiles = glob.glob(datadir+"/*dat")
 filetypes = set([])
@@ -53,6 +53,9 @@ pvars = []
 for i in range(nvarstoplot):
     pvars.append(int(input("Enter var "+str(i)+": ")))
 
+xmin = float(input("Enter minimum to plot (0 for auto):"))
+xmax = float(input("Enter maximum to plot (0 for auto):"))
+
 fig=pp.figure()
 ax = fig.add_subplot(221)
 pp.tight_layout()
@@ -61,10 +64,10 @@ pp.tight_layout()
 for iSpecies in pvars:
     ax.semilogx(data[:,iSpecies],data[:,0],
         label=vars[iSpecies])
-pp.xlabel('Sources and losses (cm$^{-3}$s$^{-1}$)')
+# pp.xlabel('Sources and losses (cm$^{-3}$s$^{-1}$)')
+pp.xlabel('Density (#/cm3)')
 pp.ylabel('Altitude (km)')
-xmin = float(input("Enter minimum to plot (0 for auto):"))
-xmax = float(input("Enter maximum to plot (0 for auto):"))
+
 
 if xmin != 0 and xmax != 0:
     pp.xlim([xmin,xmax])
@@ -72,3 +75,11 @@ pp.legend(loc='upper left',frameon=False)
 pp.text(.02, 1.02, '{}d'.format(time.days),
  transform=ax.transAxes)
 pp.savefig(datadir+'/profile.png')
+
+printmax = True
+if printmax:
+    maxv = np.max(data[:,3])
+    maxloc = np.where(data[:,3] == maxv)
+    print("Max of: {:e}\nat {}km".format(maxv,data[maxloc[0],0]))
+
+    print("Total column: {:e}".format(np.sum(data[:,3])))

@@ -17,6 +17,8 @@ def init():
 
     The altitude and temperature data are read in from files
     and then used to build the rest of the background atmosphere.
+    This read may need to be depreated since there are now
+    other methods for setting the temperature profile.
     """
 
     global JO2, JO3, kO2_O, kO3_3, kCl_O3, kCl_O, kBr_O, kBr_O3
@@ -33,6 +35,7 @@ def init():
     global sza, irradiance, irradianceTime, orbitAngle
     global equinox,longitudeOfPerihelion,orbitalDistance
     global density, difflist, userdata,PhotoDissRate_Alt
+    global nSecondsPerYear
 
 
     startTime = time.time()
