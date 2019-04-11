@@ -1,6 +1,5 @@
 """Methods related to producing model output"""
 import settings as s
-import pdb
 import inputs
 import user
 

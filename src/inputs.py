@@ -2,7 +2,6 @@
 """
 from datetime import datetime,timedelta
 import settings as s
-import pdb
 
 iError = 0
 
@@ -221,7 +220,7 @@ def readInputData(file):
 
         if line.strip().upper() == "#CHEMISTRY":
             chemsolver,iError = readchar(f)
-            if  chemsolver != "simple" and chemsolver != "explicit" \
+            if  chemsolver != "simple" \
                 and chemsolver != "backwardeuler":
                 iError = 1
                 print(chemsolver)

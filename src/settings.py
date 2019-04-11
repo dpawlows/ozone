@@ -116,6 +116,7 @@ def init():
     return 0
 
 def printMessage(totaltime):
+    '''Print a timestamp to the screen.'''
     elapsedTime = time.time() - startTime
     print("istep: {}; run time: {}hr; elapsed time: {:03.1f}s".\
     format(istep,\
@@ -123,6 +124,8 @@ def printMessage(totaltime):
     return 0
 
 def finalize(totaltime):
+    '''Finalize the simulation.'''
+
     elapsedTime = time.time() - startTime
     print("Completed in istep: {}; run time: {}s; elapsed time:\
      {:03.1f}s".format(istep,totaltime.total_seconds(),elapsedTime))
@@ -130,6 +133,7 @@ def finalize(totaltime):
     return 0
 
 def stopEOM(message):
+    '''Print a message and exit cleanly upon error.'''
     print(message+"\n")
-    print("Exitting...")
+    print("Exiting...")
     exit(1)

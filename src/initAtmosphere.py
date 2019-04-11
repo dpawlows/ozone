@@ -4,7 +4,6 @@
 from scipy import interpolate
 import numpy as np
 import settings as s
-import pdb
 from matplotlib import pyplot as pp
 import inputs
 from photo import initIrradiance
@@ -131,6 +130,9 @@ def initializeAtmosphere(f):
     return 0
 
 def checkDone(olddensity):
+    '''Check if the simulation is done, depending on the stopping
+    criteria specified in the input file.'''
+    
     if inputs.doSteadyState:
 
         maxdiff = np.max((s.density - olddensity)/olddensity)

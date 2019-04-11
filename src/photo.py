@@ -12,7 +12,6 @@ import inputs
 from astropy import units as u
 import photo
 from astropy import constants as const
-import pdb
 from datetime import datetime
 
 def blackbody_nu(in_x, temperature):
@@ -205,8 +204,6 @@ def getPhotoCrosssections():
 def initIrradiance():
     '''Integrate the irradiance to the bins specified in settings
     '''
-    #Note that the file gives values at 1nm resolution,
-    #and units are .../nm, so the sum is the same as the integral
 
     if inputs.usePhotoData:
         irradianceFile = inputs.photoFile
@@ -402,6 +399,8 @@ def getIrradiance():
     return irradiance
 
 def updateTemperature():
+    '''Update the temperature using the method specified
+    in the input file.'''
 
     if inputs.temperatureScheme.lower() == "scaled":
         #scale temperature based on orbital position

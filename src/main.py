@@ -5,7 +5,6 @@ Created on Wed Aug 29 15:46:28 2018
 
 @author: eleonoraalei
 """
-import pdb
 import glob
 import chemistry
 import initAtmosphere

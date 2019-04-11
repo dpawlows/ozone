@@ -1,7 +1,7 @@
 import settings as s
 import inputs
 from numpy import cos, pi, sin, arctan, tan, arccos
-import pdb
+
 def getOrbitalDistance():
     """Get the orbital distance based on the simulation time
     using a constant velocity approximation."""
@@ -30,8 +30,10 @@ def getOrbitalDistance():
     return 0
 
 def getSZA():
+    '''Get the sza.  Just returns the input sza.  Exisits in case
+    we want to add in a time dependent sza- i.e. a rotating planet.'''
     return inputs.SZA
-    
+
 def calcSZA():
     '''Calculate the sza based on position and time.
     This feature is not complete.  Team decided to use
