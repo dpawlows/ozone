@@ -17,6 +17,9 @@ import sys
 sys.path.insert(0, os.path.abspath('../src/'))
 sys.path.insert(0, os.path.abspath('../input/'))
 
+autodoc_mock_imports = ['astropy']
+autodoc_mock_imports = ['scipy']
+
 
 # -- Project information -----------------------------------------------------
 
@@ -80,7 +83,7 @@ pygments_style = None
 # a list of builtin themes.
 #
 # html_theme = 'alabaster'
-html_theme = 'agogo'    
+html_theme = 'agogo'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
