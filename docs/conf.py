@@ -17,8 +17,8 @@ import sys
 sys.path.insert(0, os.path.abspath('../src/'))
 sys.path.insert(0, os.path.abspath('../input/'))
 
-autodoc_mock_imports = ['astropy']
-autodoc_mock_imports = ['scipy']
+autodoc_mock_imports = ['astropy','scipy']
+
 
 
 # -- Project information -----------------------------------------------------
