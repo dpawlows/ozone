@@ -1,7 +1,0 @@
-plotProfile module
-==================
-
-.. automodule:: plotProfile
-    :members:
-    :undoc-members:
-    :show-inheritance:
