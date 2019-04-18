@@ -1,17 +1,21 @@
+
 #ATMOSPHERE
 1.0         (P/PEarth)
 0.21        (O2 mixing ratio)
 
 #STAR
-3000        (Tstar)
-0.1819           (rStar/rSun)
+5778        (Tstar)
+1           (rStar/rSun)
 
 #PLANET
-0.0837        (AU)
+1.52        (AU)
 1.0         (rPlanet/rEarth)
 1.0         (mPlanet/mEarth)
-0      (Eccentricity)
-180.2425     (nDaysInYear)
+23.5        (Tilt)
+0           (Eccentricity)
+365         (nDaysInYear)
+60          (SZA)
+
 
 #TEMPERATURE
 equilibrium
@@ -20,8 +24,8 @@ equilibrium
 
 #TSTART
 2018
-01
-03
+3
+21
 00
 00
 00
@@ -39,7 +43,7 @@ T
 0.0001
 
 #OUTPUT
-86400 (seconds)
+43200 (seconds)
 3
 ALL
 PHOTO
@@ -54,4 +58,4 @@ input/sorce_l3.dat
 1800
 
 #CHEMISTRY
-backwardEuler    (simple or explicit <-- needs tiny time step!!)
+backwardEuler    (simple or backwardEuler)
