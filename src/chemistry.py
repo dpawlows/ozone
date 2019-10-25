@@ -53,8 +53,9 @@ def calcsourceterms(u,PhotoDissRate,N,dt,ialt):
     ####### Photochemistry #####################
     ### O3 + hv -> O2 + O
     r = PhotoDissRate[s.iPhotoO3]*density[s.iO3]
-    s.userdata[1,ialt] = r
-
+    s.userdata[1,ialt] = PhotoDissRate[s.iPhotoO3]
+    s.userdata[7,ialt] = r
+    
     sources[s.iO2] += r
     sources[s.iO] += r
     losses[s.iO3] += r
@@ -64,7 +65,8 @@ def calcsourceterms(u,PhotoDissRate,N,dt,ialt):
         print(sources[2],losses[2])
     ## O2 + hv -> O + O
     r = PhotoDissRate[s.iPhotoO2]*density[s.iO2]
-    s.userdata[2,ialt] = r
+    s.userdata[2,ialt] = PhotoDissRate[s.iPhotoO2]
+    s.userdata[8,ialt] = r
 
     sources[s.iO] += 2*r
     losses[s.iO2] += r
@@ -76,8 +78,8 @@ def calcsourceterms(u,PhotoDissRate,N,dt,ialt):
     ####### Exchange #############################
     ### O+O2+M -> O3 + M
     r = s.kO2_O*density[s.iO]*density[s.iO2]*N
-    s.userdata[3,ialt] = r
-
+    s.userdata[3,ialt] = s.kO2_O
+    s.userdata[9,ialt] = r
     losses[s.iO] += r
     losses[s.iO2] +=r
     sources[s.iO3] += r
@@ -88,11 +90,26 @@ def calcsourceterms(u,PhotoDissRate,N,dt,ialt):
 
     ### O+O3 -> 2O2
     r = s.kO3_O*density[s.iO]*density[s.iO3]
-    s.userdata[4,ialt] = r
-
+    s.userdata[4,ialt] =  s.kO3_O
+    s.userdata[10,ialt] = r
     sources[s.iO2] += 2*r
     losses[s.iO] += r
     losses[s.iO3] += r
+
+
+    ########## Catalytic #######################
+    ### Cl + O3 -> ClO + O2
+    r = s.kCl_O3*density[s.iO3]*s.cl
+    s.userdata[5,ialt] =  s.kCl_O3
+    sources[s.iO2] += r
+    losses[s.iO3] += r
+
+    ### Br + O3 -> BrO + O2
+    r = s.kBr_O3*s.br*density[s.iO3]
+    s.userdata[6,ialt] =  s.kBr_O3
+    sources[s.iO2] += r
+    losses[s.iO3] += r
+
     if debug > 0:
         print("O+O3 -> 2O2")
         print(r)
@@ -107,6 +124,9 @@ def calcJacobian(density,PhotoDissRate,N):
     rO3O_O3 = s.kO3_O*density[s.iO3]
     rO3O_O  = s.kO3_O*density[s.iO]
 
+    rClO3 = s.kCl_O3*s.cl
+    rBrO3 = s.kBr_O3*s.br
+
     ###This defines the nxn jacobian matrix where element k_i,j is
     ###defined by the derivative of the P-L matrix.  Note that the
     ###index order depends on the structure of the density arrays
@@ -117,10 +137,10 @@ def calcJacobian(density,PhotoDissRate,N):
     PhotoDissRate[s.iPhotoO3]-rO3O_O],
     [2*rO3O_O3-rO2O_O2,\
     -rO2O_O-PhotoDissRate[s.iPhotoO2],\
-    PhotoDissRate[s.iPhotoO3]+2*rO3O_O],
+    PhotoDissRate[s.iPhotoO3]+2*rO3O_O+rClO3+rBrO3],
     [rO2O_O2-rO3O_O3,\
     rO2O_O,\
-    -PhotoDissRate[s.iPhotoO3]-rO3O_O],
+    -PhotoDissRate[s.iPhotoO3]-rO3O_O-rClO3-rBrO3],
     ])
 
     return k
@@ -156,7 +176,7 @@ def backwardEuler(density,PhotoDissRate,N,dt,iAlt):
     return ynew
 
 
-def calcChemistry(u0,PhotoDissRate,N,temp,dt,chemsolver='simple',iAlt=None):
+def calcChemistry(u0,PhotoDissRate,N,temp,dt,chemsolver='simple',iAlt=None,usr=None):
     """Perform the chemistry update.
 
     The \#CHEMISTRY input flag determines the method to use,
@@ -218,7 +238,7 @@ def calcChemistry(u0,PhotoDissRate,N,temp,dt,chemsolver='simple',iAlt=None):
         losses[s.iO3] += r
 
         ### Br + O3 -> BrO + O2
-        r = s.kBr_O3*s.br*u0[s.iO2]
+        r = s.kBr_O3*s.br*u0[s.iO3]
         # sources[s.iO2] += r
         losses[s.iO3] += r
 
@@ -230,7 +250,12 @@ def calcChemistry(u0,PhotoDissRate,N,temp,dt,chemsolver='simple',iAlt=None):
         # update[s.iNO2] = u0[s.iNO2]
         # update[s.iNO] = u0[s.iNO]
         # pdb.set_trace()
-
+        usr[1] = PhotoDissRate[s.iPhotoO3]
+        usr[2] = PhotoDissRate[s.iPhotoO2]
+        usr[3] = s.kO2_O
+        usr[4] =  s.kO3_O
+        usr[5] =  s.kCl_O3
+        usr[6] =  s.kBr_O3
     else:
         print('----Error: No chemistry solver specified.')
         print('----Stopping in chemistry.py')

@@ -10,8 +10,9 @@ import numpy as np
 from datetime import datetime
 import time
 import user
+import output
 
-def init():
+def init(path_input):
     """Initialize global variables including altitude and
     temperature.
 
@@ -45,12 +46,12 @@ def init():
     nSecoundsInHour = 3600
     nSecondsInMinute = 60
 
-    Altitude,initTemperature= np.loadtxt('input/ustspline.txt',\
+    Altitude,initTemperature= np.loadtxt(path_input+'/profile.txt',\
      usecols=(0,1), unpack=True)
 
     Altitude = Altitude[::-1]*1e5
     initTemperature = initTemperature[::-1]
-
+    print(Altitude, initTemperature)
     wavelengthLow = [200,300]
     wavelengthHigh = [300,400]
     nLayers = len(Altitude)
@@ -116,11 +117,13 @@ def init():
     return 0
 
 def printMessage(totaltime):
+    global difflist
+    import inputs
     '''Print a timestamp to the screen.'''
     elapsedTime = time.time() - startTime
-    print("istep: {}; run time: {}hr; elapsed time: {:03.1f}s".\
+    print("istep: {}; run time: {}hr; elapsed time: {:03.1f}s; Difference {:.2E} over {:.2E}".\
     format(istep,\
-        totaltime.total_seconds()/3600.,elapsedTime))
+        totaltime.total_seconds()/3600.,elapsedTime,difflist[-1],inputs.steadyCondition))
     return 0
 
 def finalize(totaltime):
@@ -130,6 +133,7 @@ def finalize(totaltime):
     print("Completed in istep: {}; run time: {}s; elapsed time:\
      {:03.1f}s".format(istep,totaltime.total_seconds(),elapsedTime))
     print('{:g}'.format(max(density[iO3,:])))
+    
     return 0
 
 def stopEOM(message):

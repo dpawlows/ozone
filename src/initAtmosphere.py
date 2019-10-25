@@ -97,7 +97,7 @@ def initializeAtmosphere(f):
         s.initTemperature[-1])
     #assume only O2 and N2
 
-    mu=(32.*inputs.O2mixingratio+28.*(1.-inputs.O2mixingratio))
+    mu=inputs.avgmu
     s.R_star= inputs.rStar*s.consts['R_sun']
     s.D_pl=inputs.distancePlanet*s.consts['au']
     s.R_pl=inputs.rPlanet*s.consts['R_earth']
