@@ -15,11 +15,11 @@ import output
 import photo
 import orbit
 from matplotlib import pyplot as pp
+import sys
 
-
-path_input="input/"
-files=glob.glob(path_input+"*.inp")
-iError = s.init()
+path_input=sys.argv[1]
+files=glob.glob(path_input+"/*.inp")
+iError = s.init(path_input)
 iFile = 0
 for f in files:
     iFile = iFile+1
@@ -94,11 +94,12 @@ for f in files:
                 s.N[iAlt], s.Temperature[iAlt],\
                 inputs.tstep.total_seconds(),\
                 chemsolver=inputs.chemsolver,\
-                iAlt=iAlt)
+                iAlt=iAlt,usr=s.userdata[:,iAlt])
 
             s.density[:,iAlt] = y
 
             if np.min(s.density) < 0:
+                iError = output.output(path_input,'error')
                 print('---- Error: Negative density in main...')
                 print('----Time: {}'.format(s.runTime))
                 print('----iStep: {}'.format(s.istep))
@@ -110,7 +111,7 @@ for f in files:
 
         if (s.runTime - inputs.startTime).total_seconds() %\
          inputs.dtOut < inputs.tstep.total_seconds():
-            iError = output.output()
+            iError = output.output(path_input,'')
 
         #check if done
         done = initAtmosphere.checkDone(oldDensity)
@@ -118,3 +119,4 @@ for f in files:
         oldDensity = np.copy(s.density)
 
     iError = s.finalize(s.runTime-inputs.startTime)
+    iError = output.output(path_input,'final')

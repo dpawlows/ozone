@@ -3,7 +3,7 @@ import settings as s
 import inputs
 import user
 
-def output():
+def output(path_input,fin):
     """Output to file based on output types specified in input file.
     """
 
@@ -18,8 +18,10 @@ def output():
         cTime = \
          "{:05d}_{:02d}{:02d}{:02d}".format(int(days),\
          int(hours),int(minutes),int(seconds))
-
-        file = "data/{}_{}.dat".format(type,cTime)
+        if len(fin)>0:
+            file = path_input+"/{}_{}final.dat".format(type,cTime)
+        else:
+            file = path_input+"/{}_{}.dat".format(type,cTime)
         try:
             outfile = open(file,'w')
         except:
@@ -31,18 +33,22 @@ def output():
             format(s.orbitalDistance))
 
         if type.lower() == "all":
-            outfile.write("#Alt\t[O]\t[O2]\t[O3]\n")
+            outfile.write("#Alt\t[O]\t[O2]\t[O3]\tOvmr\tO2vmr\tO3vmr\n")
 
             for iAlt in range(s.nLayers):
 
                 outfile.write('{:05.2f}\t'.format(s.Altitude[iAlt]/1e5))
                 outfile.write('\t'.join("{:09.7e}".format(d) for d \
                     in s.density[:,iAlt]))
+                outfile.write('\t')
+                outfile.write('\t'.join("{:09.7e}".format(d) for d \
+                                            in s.density[:,iAlt]/s.N[iAlt]))
                 outfile.write('\n')
 
 
         if type.lower() == "photo":
-            outfile.write("#Alt\tJ(O2)\tJ(O3)\n")
+            
+            outfile.write("#Alt\tJ(O3)\tJ(O2)\n")
 
             for iAlt in range(s.nLayers):
 

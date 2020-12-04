@@ -13,7 +13,7 @@ def inituser(nlayers):
 
     '''
 
-    nvars = 5
+    nvars = 11
 
     return zeros((nvars,nlayers))
 
@@ -22,7 +22,7 @@ def outputuser(file,data):
     '''Output the USER file type'''
 
     ### This shouldn't change unless you know what you are doing!
-    file.write("#Alt\tr(O3+hv)\tr(O2+hv)\tk(O2_O)\tkO3_O\n")
+    file.write("#Alt\tJ(O3)\tJ(O2)\tk1\tk2\tk3\tk4\trJ(O3)\trJ(O2)\trk1\trk2\n")
     for iAlt in range(len(data[0,:])):
         file.write('{:05.2f}\t'.format(data[0,iAlt]))
         file.write('\t'.join("{:09.7e}".format(d) for d \

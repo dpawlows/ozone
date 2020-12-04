@@ -409,13 +409,23 @@ def updateTemperature():
     elif inputs.temperatureScheme.lower() == "isothermal":
         #initTemperature is set to input temperature in inputs
         s.Temperature = s.initTemperature
+    elif inputs.temperatureScheme.lower() == "avgscaled":
+        #initTemperature is set to input temperature in inputs
+        mean = np.mean(s.initTemperature)
+        equil = ((2/(2-inputs.emission))*1367. * \
+        (1/s.orbitalDistance)**2*(inputs.tStar/5778.)**4 * \
+        inputs.rStar**2 * (1-inputs.albedo) /\
+        (8*s.consts['sigmaSB']))**(0.25)
+        scale = mean - equil
+        s.Temperature = [t - scale for t in s.initTemperature]
+
     elif inputs.temperatureScheme.lower() == "equilibrium":
         s.Temperature = [((2/(2-inputs.emission))*1367. * \
         (1/s.orbitalDistance)**2*(inputs.tStar/5778.)**4 * \
         inputs.rStar**2 * (1-inputs.albedo) /\
         (8*s.consts['sigmaSB']))**(0.25) for t in s.initTemperature]
-
+        
     else:
         s.Temperature = s.initTemperature
-
+    print('TEMP', np.mean(s.Temperature))
     return 0

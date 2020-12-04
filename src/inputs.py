@@ -56,7 +56,7 @@ def readInputData(file):
     User file(s) are passed as input, but are expected to be
     located in inputs/\*inp.
     """
-    global usePhotoData, pressure, O2mixingratio, rPlanet
+    global usePhotoData, pressure, O2mixingratio, rPlanet, avgmu
     global rStar, tStar, distancePlanet, massPlanet, tempPlanet
     global dtOut, tstep, tEnd, chemsolver, sza, photoFile
     global startTime, endTime, eccentricity,nDaysInYear
@@ -144,6 +144,7 @@ def readInputData(file):
                 tempScaleFactor, iError = readfloat(f)
 
             if temperatureScheme.lower() == "isothermal":
+
                 #isothermal...
                 temperature, iError = readfloat(f)
                 s.initTemperature = \
@@ -153,7 +154,13 @@ def readInputData(file):
                 #calculate equilibrium temperature
                 albedo, iError = readfloat(f)
                 emission, iError = readfloat(f)
+            if temperatureScheme.lower() == "avgscaled":
+                #calculate equilibrium temperature
+                albedo, iError = readfloat(f)
+                emission, iError = readfloat(f)
+            if temperatureScheme.lower() == "input":
 
+                pass
             if iError > 0:
                 print("Error in readInputData")
                 print("#TEMPERATURE")
@@ -166,13 +173,15 @@ def readInputData(file):
             iError = max(iError,iErr)
             O2mixingratio,iErr = readfloat(f)
             iError = max(iError,iErr)
-
+            avgmu,iErr = readfloat(f)
             if iError > 0:
                 print("Error in readInputData")
                 print("#RADIATIONPARAMETERS")
                 print("Float    (P/PEarth)")
                 print("Float    (O2mixingratio)")
+                print("Float    (avg molecular weight atmosphere)")
                 exit(iError)
+            print(O2mixingratio,avgmu)
 
         if line.strip().upper() == "#OUTPUT":
             dtOut,iError = readfloat(f)
