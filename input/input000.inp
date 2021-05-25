@@ -2,26 +2,26 @@
 #ATMOSPHERE
 1.0         (P/PEarth)
 0.21        (O2 mixing ratio)
-28			(avg mu)
+28.96
 
 #STAR
 5778        (Tstar)
 1           (rStar/rSun)
 
 #PLANET
-1       (AU)
+1.52        (AU)
 1.0         (rPlanet/rEarth)
 1.0         (mPlanet/mEarth)
 23.5        (Tilt)
 0           (Eccentricity)
 365         (nDaysInYear)
-45          (SZA)
+60          (SZA)
 
 
 #TEMPERATURE
-input
+equilibrium
 0.3
-0.
+.67
 
 #TSTART
 2018
@@ -32,21 +32,23 @@ input
 00
 
 #TEND
-2019
-01
+2018
+12
 13
 00
 00
 00
 
 #STEADYSTATE
-T
-0.005
+F
+0.0001
 
 #OUTPUT
 43200 (seconds)
-1
+3
 ALL
+PHOTO
+USER
 
 
 #USEPHOTODATA
@@ -54,7 +56,7 @@ F
 input/sorce_l3.dat
 
 #TSTEP
-180
+1800
 
 #CHEMISTRY
-backwardEuler   (simple or backwardEuler)
+backwardEuler    (simple or backwardEuler)

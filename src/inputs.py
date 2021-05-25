@@ -174,6 +174,7 @@ def readInputData(file):
             O2mixingratio,iErr = readfloat(f)
             iError = max(iError,iErr)
             avgmu,iErr = readfloat(f)
+            iError = max(iError,iErr)
             if iError > 0:
                 print("Error in readInputData")
                 print("#RADIATIONPARAMETERS")
@@ -181,7 +182,7 @@ def readInputData(file):
                 print("Float    (O2mixingratio)")
                 print("Float    (avg molecular weight atmosphere)")
                 exit(iError)
-            print(O2mixingratio,avgmu)
+            
 
         if line.strip().upper() == "#OUTPUT":
             dtOut,iError = readfloat(f)

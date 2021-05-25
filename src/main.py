@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Created on Wed Aug 29 15:46:28 2018
@@ -111,7 +111,7 @@ for f in files:
 
         if (s.runTime - inputs.startTime).total_seconds() %\
          inputs.dtOut < inputs.tstep.total_seconds():
-            iError = output.output(path_input,'')
+            iError = output.output('data','')
 
         #check if done
         done = initAtmosphere.checkDone(oldDensity)
@@ -119,4 +119,4 @@ for f in files:
         oldDensity = np.copy(s.density)
 
     iError = s.finalize(s.runTime-inputs.startTime)
-    iError = output.output(path_input,'final')
+    iError = output.output('data','final')

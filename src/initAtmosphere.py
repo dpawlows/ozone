@@ -104,7 +104,6 @@ def initializeAtmosphere(f):
     s.M_pl=inputs.massPlanet*s.consts['M_earth']
     s.tstar=inputs.tStar
     s.g=s.consts['G']*s.M_pl/s.R_pl/s.R_pl #cm s-2
-
     Hsca=(s.consts['k_B']*np.mean(s.initTemperature)/(mu*  \
         s.consts['protonmass']*s.g))#cm
 
@@ -132,7 +131,7 @@ def initializeAtmosphere(f):
 def checkDone(olddensity):
     '''Check if the simulation is done, depending on the stopping
     criteria specified in the input file.'''
-    
+
     if inputs.doSteadyState:
 
         maxdiff = np.max((s.density - olddensity)/olddensity)

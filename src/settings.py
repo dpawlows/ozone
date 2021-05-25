@@ -121,9 +121,9 @@ def printMessage(totaltime):
     import inputs
     '''Print a timestamp to the screen.'''
     elapsedTime = time.time() - startTime
-    print("istep: {}; run time: {}hr; elapsed time: {:03.1f}s; Difference {:.2E} over {:.2E}".\
+    print("istep: {}; run time: {}hr; elapsed time: {:03.1f}s; Difference {:.2E}".\
     format(istep,\
-        totaltime.total_seconds()/3600.,elapsedTime,difflist[-1],inputs.steadyCondition))
+        totaltime.total_seconds()/3600.,elapsedTime,difflist[-1]))
     return 0
 
 def finalize(totaltime):
@@ -133,7 +133,7 @@ def finalize(totaltime):
     print("Completed in istep: {}; run time: {}s; elapsed time:\
      {:03.1f}s".format(istep,totaltime.total_seconds(),elapsedTime))
     print('{:g}'.format(max(density[iO3,:])))
-    
+
     return 0
 
 def stopEOM(message):
