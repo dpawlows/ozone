@@ -3,7 +3,7 @@ import settings as s
 import inputs
 import user
 
-def output(path_input):
+def output(path_input,fin):
     """Output to file based on output types specified in input file.
     """
 
@@ -18,8 +18,10 @@ def output(path_input):
         cTime = \
          "{:05d}_{:02d}{:02d}{:02d}".format(int(days),\
          int(hours),int(minutes),int(seconds))
-
-        file = path_input+"/{}_{}.dat".format(type,cTime)
+        if len(fin)>0:
+            file = path_input+"/final.dat".format(type,cTime)
+        else:
+            file = path_input+"/{}_{}.dat".format(type,cTime)
         try:
             outfile = open(file,'w')
         except:
