@@ -3,7 +3,7 @@ import settings as s
 import inputs
 import user
 
-def output(path_input,fin):
+def output(path_input):
     """Output to file based on output types specified in input file.
     """
 
@@ -18,10 +18,8 @@ def output(path_input,fin):
         cTime = \
          "{:05d}_{:02d}{:02d}{:02d}".format(int(days),\
          int(hours),int(minutes),int(seconds))
-        if len(fin)>0:
-            file = path_input+"/{}_{}final.dat".format(type,cTime)
-        else:
-            file = path_input+"/{}_{}.dat".format(type,cTime)
+
+        file = path_input+"/{}_{}.dat".format(type,cTime)
         try:
             outfile = open(file,'w')
         except:
@@ -47,7 +45,7 @@ def output(path_input,fin):
 
 
         if type.lower() == "photo":
-            
+
             outfile.write("#Alt\tJ(O3)\tJ(O2)\n")
 
             for iAlt in range(s.nLayers):

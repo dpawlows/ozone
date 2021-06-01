@@ -119,4 +119,4 @@ for f in files:
         oldDensity = np.copy(s.density)
 
     iError = s.finalize(s.runTime-inputs.startTime)
-    iError = output.output('data','final')
+    iError = output.output('data')
