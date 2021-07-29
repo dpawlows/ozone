@@ -8,8 +8,9 @@ def output(path_input,fin):
     """
 
     for type in inputs.cOutputType:
-        print("Writing output type: {} at {:6.1f}h".\
-            format(type,(s.runTime-inputs.startTime).total_seconds()/3600.))
+        #EDIT BLAYCOCK 6/27; commented out the print to screen
+        #print("Writing output type: {} at {:6.1f}h".\
+            #format(type,(s.runTime-inputs.startTime).total_seconds()/3600.))
         days, remainder = \
             divmod((s.runTime-inputs.startTime).total_seconds(),\
             s.nSecondsInDay)

@@ -424,8 +424,9 @@ def updateTemperature():
         (1/s.orbitalDistance)**2*(inputs.tStar/5778.)**4 * \
         inputs.rStar**2 * (1-inputs.albedo) /\
         (8*s.consts['sigmaSB']))**(0.25) for t in s.initTemperature]
-        
+
     else:
         s.Temperature = s.initTemperature
-    print('TEMP', np.mean(s.Temperature))
+    #EDIT BLAYCOCK 6/27; Added and later commented out, for retreiving average atm. temp
+    #print('TEMP', np.mean(s.Temperature))
     return 0

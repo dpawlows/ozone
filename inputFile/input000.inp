@@ -1,0 +1,62 @@
+
+#ATMOSPHERE
+1.0         (Pressure Ratio)
+0.21        (O2 mixing ratio)
+28.96       (Average Molar Mass of the Atmosphere)
+
+#STAR
+5500       (Tstar)
+1          (rStar/rSun)
+
+#PLANET
+1.0         (AU)
+1.0         (rPlanet/rEarth)
+1.0         (mPlanet/mEarth)
+23.5        (Tilt)
+0           (Eccentricity)
+365         (nDaysInYear)
+20          (SZA)
+
+
+#TEMPERATURE
+equilibrium (input, isothermal, equilibrium, avgscaled)
+0.3         (albedo)
+.67         (emissivity)
+
+#TSTART
+2021        (year)
+1           (month)
+1           (day)
+00          (hour)
+00          (minute)
+00          (second)
+
+#TEND
+2021        (year)
+2          (month)
+1          (day)
+00          (hour)
+00          (minute)
+00          (second)
+
+#STEADYSTATE
+F
+0.0001      (convergence criteria)
+
+#OUTPUT
+1800       (seconds, how often output is written)
+3           (number of outputs to write)
+ALL
+PHOTO
+USER
+
+
+#USEPHOTODATA
+F
+input/sorce_l3.dat
+
+#TSTEP
+1800         (time step, seconds)
+
+#CHEMISTRY
+backwardEuler    (simple or backwardEuler)

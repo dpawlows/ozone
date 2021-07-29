@@ -51,7 +51,7 @@ def init(path_input):
 
     Altitude = Altitude[::-1]*1e5
     initTemperature = initTemperature[::-1]
-    print(Altitude, initTemperature)
+    #print(Altitude, initTemperature)
     wavelengthLow = [200,300]
     wavelengthHigh = [300,400]
     nLayers = len(Altitude)
@@ -132,8 +132,9 @@ def finalize(totaltime):
     elapsedTime = time.time() - startTime
     print("Completed in istep: {}; run time: {}s; elapsed time:\
      {:03.1f}s".format(istep,totaltime.total_seconds(),elapsedTime))
-    print('{:g}'.format(max(density[iO3,:])))
-
+    #print('{:g}'.format(max(density[iO3,:])))
+    #EDIT BLAYCOCK ON 6/27; added a print temperature line for data analysis
+    print('Atmosphere Temperature:', np.mean(Temperature))
     return 0
 
 def stopEOM(message):
