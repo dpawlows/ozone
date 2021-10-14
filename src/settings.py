@@ -22,15 +22,15 @@ def init(path_input):
     other methods for setting the temperature profile.
     """
 
-    global JO2, JO3, kO2_O, kO3_3, kCl_O3, kCl_O, kBr_O, kBr_O3
-    global br, cl, iO, iO2, iO3, iNO2, iNO
+    global JO2, JO3, JCO2, kO2_O, kO3_3, kCl_O3, kCl_O, kBr_O, kBr_O3, kCO_O
+    global br, cl, iO, iO2, iO3, iNO2, iNO, iCO, iCO2
     global Temperature,initTemperature,nLayers, nMajorSpecies
-    global O2PhotoDissociationRate, O3PhotoDissocationRate
-    global NO2PhotoDissocationRate
+    global O2PhotoDissociationRate, O3PhotoDissociationRate
+    global NO2PhotoDissocationRate, CO2PhotoDissociationRate
     global cSpeciesNames, nWavelengths,wavelengthLow,wavelengthHigh
     global g, consts, Altitude, tstar, D_pl, R_pl, R_star
     global PhotoSpecies, PhotoDissociationCrosssections
-    global iPhotoO2,iPhotoO3,iPhotoNO2, nPhotoSpecies
+    global iPhotoO2,iPhotoO3,iPhotoNO2, iPhotoCO2, nPhotoSpecies
     global istep, dtprint, runTime, totaltime, startTime
     global nSecondsInDay, nSecoundsInHour, nSecondsInMinute
     global irradiance, irradianceTime, orbitAngle
@@ -62,26 +62,32 @@ def init(path_input):
     iO = 0
     iO2 = 1
     iO3 = 2
-    iNO2 = 4
-    iNO = 3
-    nMajorSpecies = 3
-    cSpeciesNames = ['']*nMajorSpecies
+    iNO2 = 6
+    iNO = 5
+    iCO = 3
+    iCO2 = 4
+    nMajorSpecies = 4
+    cSpeciesNames = ['']*(iCO2+1)
     cSpeciesNames[iO] = 'O'
     cSpeciesNames[iO2] = 'O2'
     cSpeciesNames[iO3] = 'O3'
     # cSpeciesNames[iNO2] = 'NO2'
     # cSpeciesNames[iNO] = 'NO'
-
+    cSpeciesNames[iCO] = 'CO'
+    cSpeciesNames[iCO2] = 'CO2'
 
     #Dissocation Stuff
     #Different than chemical because not all majors have dissociation
     O2PhotoDissociationRate = [0]*nLayers
-    O3PhotoDissocationRate = [0]*nLayers
+    O3PhotoDissociationRate = [0]*nLayers
     NO2PhotoDissocationRate = [0]*nLayers
+    CO2PhotoDissociationRate = [0]*nLayers
+
     iPhotoO2 = 0
     iPhotoO3 = 1
-    iPhotoNO2 = 2
-    PhotoSpecies = ['O2','O3']#,'NO2']
+    #iPhotoNO2 = 3
+    iPhotoCO2 = 2
+    PhotoSpecies = ['O2','O3', 'CO2']#,'NO2']
     nPhotoSpecies = len(PhotoSpecies)
     PhotoDissociationCrosssections = [0.0]*nPhotoSpecies
     PhotoDissRate_Alt = np.zeros((nPhotoSpecies,nLayers))

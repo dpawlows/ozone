@@ -56,7 +56,7 @@ def readInputData(file):
     User file(s) are passed as input, but are expected to be
     located in inputs/\*inp.
     """
-    global usePhotoData, pressure, O2mixingratio, rPlanet, avgmu
+    global usePhotoData, pressure, O2mixingratio, CO2mixingratio, rPlanet, avgmu
     global rStar, tStar, distancePlanet, massPlanet, tempPlanet
     global dtOut, tstep, tEnd, chemsolver, sza, photoFile
     global startTime, endTime, eccentricity,nDaysInYear
@@ -173,6 +173,8 @@ def readInputData(file):
             iError = max(iError,iErr)
             O2mixingratio,iErr = readfloat(f)
             iError = max(iError,iErr)
+            CO2mixingratio,iErr = readfloat(f)
+            iError = max(iError,iErr)
             avgmu,iErr = readfloat(f)
             iError = max(iError,iErr)
             if iError > 0:
@@ -180,9 +182,10 @@ def readInputData(file):
                 print("#RADIATIONPARAMETERS")
                 print("Float    (P/PEarth)")
                 print("Float    (O2mixingratio)")
+                print("Float    (CO2mixingratio)")
                 print("Float    (avg molecular weight atmosphere)")
                 exit(iError)
-            
+
 
         if line.strip().upper() == "#OUTPUT":
             dtOut,iError = readfloat(f)

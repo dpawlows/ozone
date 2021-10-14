@@ -96,7 +96,8 @@ for f in files:
                 chemsolver=inputs.chemsolver,\
                 iAlt=iAlt,usr=s.userdata[:,iAlt])
 
-            s.density[:,iAlt] = y
+            #### We only update the major species.
+            s.density[0:s.nMajorSpecies,iAlt] = y[0:s.nMajorSpecies]
 
             if np.min(s.density) < 0:
                 iError = output.output(path_input,'error')

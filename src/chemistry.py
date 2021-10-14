@@ -23,6 +23,10 @@ def updateRates(temp):
     s.kNO_O3 = 1.7e-12*np.exp(-1310/temp)
     s.kNO2_O = 9.1e-12
 
+    #CO chemistry rates from Booker et al. 2014
+    s.kCO_O_CO2 = 6.5e-33*np.exp(-2180/temp)
+    s.kO_O2_CO2 = 1.35e-33
+
     return 0
 
 def calcsourceterms(u,PhotoDissRate,N,dt,ialt):
@@ -43,6 +47,8 @@ def calcsourceterms(u,PhotoDissRate,N,dt,ialt):
         print('iO3: {}'.format(s.iO3))
         print('iNO2: {}'.format(s.iNO2))
         print('iNO: {}'.format(s.iNO))
+        print('iCO: {}'.format(s.iCO))
+        print('iCO2: {}'.format(s.iCO2))
 
     if s.istep == 0:
         #initialize with a reasonable O profile
@@ -55,7 +61,7 @@ def calcsourceterms(u,PhotoDissRate,N,dt,ialt):
     r = PhotoDissRate[s.iPhotoO3]*density[s.iO3]
     s.userdata[1,ialt] = PhotoDissRate[s.iPhotoO3]
     s.userdata[7,ialt] = r
-    
+
     sources[s.iO2] += r
     sources[s.iO] += r
     losses[s.iO3] += r
@@ -72,6 +78,16 @@ def calcsourceterms(u,PhotoDissRate,N,dt,ialt):
     losses[s.iO2] += r
     if debug > 0:
         print("O2 + hv -> O + O")
+        print(r)
+        print(sources[2],losses[2])
+
+    ## CO2 + hv -> CO + O
+    r = PhotoDissRate[s.iPhotoCO2]*density[s.iCO2]
+    sources[s.iCO] += r
+    sources[s.iO] += r
+    #losses[s.iCO2] += r
+    if debug > 0:
+        print("CO2 + hv -> CO + O")
         print(r)
         print(sources[2],losses[2])
 
@@ -96,6 +112,25 @@ def calcsourceterms(u,PhotoDissRate,N,dt,ialt):
     losses[s.iO] += r
     losses[s.iO3] += r
 
+    ### CO+O+CO2 -> 2CO2
+    r = s.kCO_O_CO2*density[s.iO]*density[s.iCO]*density[s.iCO2]
+    losses[s.iCO] += r
+    losses[s.iO] +=r
+    #sources[s.iCO2] += r
+    if debug > 0:
+        print("CO+O+CO2 -> 2CO2")
+        print(r)
+        print(sources[2],losses[2])
+
+    ### O+O2+CO2 -> O3+CO2
+    r = s.kO_O2_CO2*density[s.iO]*density[s.iO2]*density[s.iCO2]
+    losses[s.iO] += r
+    losses[s.iO2] +=r
+    sources[s.iO3] += r
+    if debug > 0:
+        print("CO+O+CO2 -> O3+CO2")
+        print(r)
+        print(sources[2],losses[2])
 
     ########## Catalytic #######################
     ### Cl + O3 -> ClO + O2
@@ -119,28 +154,42 @@ def calcsourceterms(u,PhotoDissRate,N,dt,ialt):
 
 def calcJacobian(density,PhotoDissRate,N):
     '''Get jacobian maxtrix for backward euler. '''
-    rO2O_O2 = s.kO2_O*density[s.iO2]*N
-    rO2O_O  = s.kO2_O*density[s.iO]*N
-    rO3O_O3 = s.kO3_O*density[s.iO3]
-    rO3O_O  = s.kO3_O*density[s.iO]
-
-    rClO3 = s.kCl_O3*s.cl
-    rBrO3 = s.kBr_O3*s.br
+    #Create each element that would go in the Jacobian here, then add to the code below
+    rO2O_O2 = s.kO2_O*density[s.iO2]*N #O + O2 + M -> O3 + M, track O2
+    rO2O_O  = s.kO2_O*density[s.iO]*N #O + O2 + M -> O3 + M, track O
+    rO3O_O3 = s.kO3_O*density[s.iO3] #O3 + O -> 2 O2, track O3
+    rO3O_O  = s.kO3_O*density[s.iO]  #O3 + O -> 2 O2, track O
+    rOCOCO2_COCO2 = s.kCO_O_CO2*density[s.iCO]*density[s.iCO2] #O + CO + CO2 -> 2CO2, track CO/CO2
+    rOCOCO2_OCO2  = s.kCO_O_CO2*density[s.iO]*density[s.iCO2] #O + CO + CO2 -> 2CO2, track O/CO2
+    rOO2CO2_O2CO2 = s.kO_O2_CO2*density[s.iO2]*density[s.iCO2] #O + O2 + CO2 -> O3 + CO2, track O2/CO2
+    rOO2CO2_OCO2 = s.kO_O2_CO2*density[s.iO]*density[s.iCO2] #O + O2 + CO2 -> O3 + CO2, track O/CO2
+    rClO3 = s.kCl_O3*s.cl #Cl + O3 -> ClO + O2, track Cl
+    rBrO3 = s.kBr_O3*s.br #Br + O3 -> BrO + O2, track Br
 
     ###This defines the nxn jacobian matrix where element k_i,j is
     ###defined by the derivative of the P-L matrix.  Note that the
     ###index order depends on the structure of the density arrays
     ###and the reactions must be in the right index.
+    ###Taken from the Jacobian sheet in the reactoins workbook.
+    ###Each left square bracket represents the start of a new row of the Jacobian
+
     k = np.array([
-    [-rO2O_O2-rO3O_O3,\
+    [-rO2O_O2-rO3O_O3-rOCOCO2_COCO2,\
     2*PhotoDissRate[s.iPhotoO2]-rO2O_O,\
-    PhotoDissRate[s.iPhotoO3]-rO3O_O],
+    PhotoDissRate[s.iPhotoO3]-rO3O_O,\
+    -rOCOCO2_OCO2],
     [2*rO3O_O3-rO2O_O2,\
     -rO2O_O-PhotoDissRate[s.iPhotoO2],\
-    PhotoDissRate[s.iPhotoO3]+2*rO3O_O+rClO3+rBrO3],
+    PhotoDissRate[s.iPhotoO3]+2*rO3O_O+rClO3+rBrO3,\
+    0],
     [rO2O_O2-rO3O_O3,\
     rO2O_O,\
-    -PhotoDissRate[s.iPhotoO3]-rO3O_O-rClO3-rBrO3],
+    -PhotoDissRate[s.iPhotoO3]-rO3O_O-rClO3-rBrO3,\
+    0],
+    [-rOCOCO2_COCO2,\
+    0,\
+    0,\
+    -rOCOCO2_OCO2]
     ])
 
     return k
@@ -154,23 +203,26 @@ def backwardEuler(density,PhotoDissRate,N,dt,iAlt):
     sources,losses = \
      calcsourceterms(density,PhotoDissRate,N,dt,iAlt)
     ynew = density
-
+    yold = [1.0]*len(ynew)
     tol = 0.1
-    yold = [1.0]*s.nMajorSpecies
     I = np.identity(s.nMajorSpecies)
     istep = 0
 
     while max(abs(ynew - yold)/yold) > tol:
-
+        print("error thing=", (ynew-yold)/yold)
+        print("yold =", yold)
+        print("ynew =", ynew)
         yold = np.copy(ynew)
         sources,losses =\
          calcsourceterms(yold,PhotoDissRate,N,dt,iAlt)
 
         #Make the backwards step
-        g = yold-density-dt*(sources - losses)
+        g = yold[0:s.nMajorSpecies]-density[0:s.nMajorSpecies]-dt*(sources - losses)
         K = calcJacobian(yold,PhotoDissRate,N)
-        ynew = yold - (linalg.inv(I-K*dt)).dot(g)
 
+        ynew[0:s.nMajorSpecies] = yold[0:s.nMajorSpecies] - (linalg.inv(I-K*dt)).dot(g)
+
+        breakpoint()
         istep = istep + 1
 
     return ynew
@@ -206,6 +258,7 @@ def calcChemistry(u0,PhotoDissRate,N,temp,dt,chemsolver='simple',iAlt=None,usr=N
     iError = updateRates(temp)
 
     #Chose chemical solver
+
     if chemsolver == "backwardeuler":
         update = backwardEuler(u0,PhotoDissRate,N,dt,iAlt)
 
@@ -260,5 +313,6 @@ def calcChemistry(u0,PhotoDissRate,N,temp,dt,chemsolver='simple',iAlt=None,usr=N
         print('----Error: No chemistry solver specified.')
         print('----Stopping in chemistry.py')
         exit(1)
+
 
     return update

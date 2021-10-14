@@ -113,7 +113,9 @@ def initializeAtmosphere(f):
     s.N=[(nDensity[-1]*np.exp(-z/Hsca)) for z in s.Altitude]
 
     s.O2=[inputs.O2mixingratio*i for i in s.N]
-    s.N2=[(1.-inputs.O2mixingratio)*i for i in s.N]
+    s.CO2=[inputs.CO2mixingratio*i for i in s.N]
+    s.N2=[(1.-inputs.O2mixingratio-inputs.CO2mixingratio)*i for i in s.N]
+    s.CO=[0]*len(s.Altitude)
     s.O3=[1e6]*len(s.Altitude)
     s.O=[1e9]*len(s.Altitude)
     s.NO2 = getNOComposition(s.Altitude)
@@ -121,7 +123,7 @@ def initializeAtmosphere(f):
     s.OH = getOHComposition(s.Altitude)
     s.totaltime=timedelta(seconds=0)
     # s.density = np.zeros((s.nLayers,s.nMajorSpecies))
-    s.density = np.array([s.O,s.O2,s.O3])
+    s.density = np.array([s.O,s.O2,s.O3,s.CO,s.CO2])
 
     if inputs.usePhotoData:
         s.irradiance = initIrradiance()
