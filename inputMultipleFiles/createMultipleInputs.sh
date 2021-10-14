@@ -22,8 +22,8 @@ do
   for press in ${!pressure[@]}
   do
     iFile=$(printf "input%.03d.inp" $i)
-    cp /Users/blaycock/Research/ozone/inputFiles/input000.inp /Users/blaycock/Research/ozone/inputMultipleFiles/$iFile
-    sed -i '' "s/.*(Tstar)/${temperature[$temps]} (TStar)/g" "$iFile"
+    cp /Users/blaycock/Research/ozone/inputFile/input000.inp /Users/blaycock/Research/ozone/inputMultipleFiles/$iFile
+    sed -i '' "s/.*(TStar)/${temperature[$temps]} (TStar)/g" "$iFile"
     sed -i '' "s/.*(Pressure Ratio)/${pressure[$press]} (Pressure Ratio)/g" "$iFile"
     let i++
     echo $iFile

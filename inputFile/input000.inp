@@ -1,11 +1,13 @@
 
 #ATMOSPHERE
-1.0         (Pressure Ratio)
+1 (Pressure Ratio)
 0.21        (O2 mixing ratio)
+0.00          (CO2 mixing ratio)
 28.96       (Average Molar Mass of the Atmosphere)
 
+
 #STAR
-5500       (Tstar)
+2500       (TStar)
 1          (rStar/rSun)
 
 #PLANET
