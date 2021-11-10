@@ -202,26 +202,36 @@ def backwardEuler(density,PhotoDissRate,N,dt,iAlt):
 
     sources,losses = \
      calcsourceterms(density,PhotoDissRate,N,dt,iAlt)
-    ynew = density
+    ynew = np.copy(density)
     yold = [1.0]*len(ynew)
     tol = 0.1
     I = np.identity(s.nMajorSpecies)
     istep = 0
 
     while max(abs(ynew - yold)/yold) > tol:
-        print("error thing=", (ynew-yold)/yold)
-        print("yold =", yold)
-        print("ynew =", ynew)
+        #print("error thing=", (ynew-yold)/yold)
+
         yold = np.copy(ynew)
+        #print("yold =", yold)
+        #print("ynew =", ynew)
+        #print("density =", density)
+        #breakpoint()
+
         sources,losses =\
          calcsourceterms(yold,PhotoDissRate,N,dt,iAlt)
 
         #Make the backwards step
         g = yold[0:s.nMajorSpecies]-density[0:s.nMajorSpecies]-dt*(sources - losses)
         K = calcJacobian(yold,PhotoDissRate,N)
+        #print("sources", sources, "losses", losses)
+        #print(sources-losses)
+        #print("g", g)
+        #print("density", density)
+        #print("yold-density", yold-density)
+        #print("k", K)
 
         ynew[0:s.nMajorSpecies] = yold[0:s.nMajorSpecies] - (linalg.inv(I-K*dt)).dot(g)
-
+        print("ynew =", ynew)
         breakpoint()
         istep = istep + 1
 

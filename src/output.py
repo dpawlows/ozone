@@ -34,7 +34,7 @@ def output(path_input,fin):
             format(s.orbitalDistance))
 
         if type.lower() == "all":
-            outfile.write("#Alt\t[O]\t[O2]\t[O3]\tOvmr\tO2vmr\tO3vmr\n")
+            outfile.write("#Alt\t[O]\t[O2]\t[O3]\t[CO]\t[CO2]\tOvmr\tO2vmr\tO3vmr\tCOvmr\tCO2vmr\n")
 
             for iAlt in range(s.nLayers):
 

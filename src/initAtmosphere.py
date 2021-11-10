@@ -113,9 +113,9 @@ def initializeAtmosphere(f):
     s.N=[(nDensity[-1]*np.exp(-z/Hsca)) for z in s.Altitude]
 
     s.O2=[inputs.O2mixingratio*i for i in s.N]
-    s.CO2=[inputs.CO2mixingratio*i for i in s.N]
+    s.CO2=[(inputs.CO2mixingratio*i) for i in s.N]
     s.N2=[(1.-inputs.O2mixingratio-inputs.CO2mixingratio)*i for i in s.N]
-    s.CO=[0]*len(s.Altitude)
+    s.CO=[1e6]*len(s.Altitude)
     s.O3=[1e6]*len(s.Altitude)
     s.O=[1e9]*len(s.Altitude)
     s.NO2 = getNOComposition(s.Altitude)
