@@ -53,9 +53,9 @@ def calcsourceterms(u,PhotoDissRate,N,dt,ialt):
     if s.istep == 0:
         #initialize with a reasonable O profile
         density[s.iO] = (2*PhotoDissRate[s.iPhotoO2]*density[s.iO2] + \
-        PhotoDissRate[s.iPhotoO3]*density[s.iO3]) \
-        / (s.kO2_O*density[s.iO2]*N+s.kO3_O*density[s.iO3])
-
+        PhotoDissRate[s.iPhotoO3]*density[s.iO3] + PhotoDissRate[s.iPhotoCO2]*density[s.iCO2]) \
+        / (s.kO2_O*density[s.iO2]*N+s.kO3_O*density[s.iO3]+s.kO_O2_CO2*density[s.iO2]*density[s.iCO2])
+ ######Had to update this when new reactions are added or software crashed
     ####### Photochemistry #####################
     ### O3 + hv -> O2 + O
     r = PhotoDissRate[s.iPhotoO3]*density[s.iO3]
@@ -174,16 +174,16 @@ def calcJacobian(density,PhotoDissRate,N):
     ###Each left square bracket represents the start of a new row of the Jacobian
 
     k = np.array([
-    [-rO2O_O2-rO3O_O3-rOCOCO2_COCO2,\
-    2*PhotoDissRate[s.iPhotoO2]-rO2O_O,\
+    [-rO2O_O2-rO3O_O3-rOO2CO2_O2CO2-rOCOCO2_COCO2,\
+    2*PhotoDissRate[s.iPhotoO2]-rO2O_O-rOO2CO2_OCO2,\
     PhotoDissRate[s.iPhotoO3]-rO3O_O,\
     -rOCOCO2_OCO2],
-    [2*rO3O_O3-rO2O_O2,\
-    -rO2O_O-PhotoDissRate[s.iPhotoO2],\
+    [2*rO3O_O3-rO2O_O2-rOO2CO2_O2CO2,\
+    -rO2O_O-PhotoDissRate[s.iPhotoO2]-rOO2CO2_OCO2,\
     PhotoDissRate[s.iPhotoO3]+2*rO3O_O+rClO3+rBrO3,\
     0],
-    [rO2O_O2-rO3O_O3,\
-    rO2O_O,\
+    [rO2O_O2+rOO2CO2_O2CO2-rO3O_O3,\
+    rO2O_O+rOO2CO2_OCO2,\
     -PhotoDissRate[s.iPhotoO3]-rO3O_O-rClO3-rBrO3,\
     0],
     [-rOCOCO2_COCO2,\
@@ -209,9 +209,8 @@ def backwardEuler(density,PhotoDissRate,N,dt,iAlt):
     istep = 0
 
     while max(abs(ynew - yold)/yold) > tol:
-        #print("error thing=", (ynew-yold)/yold)
-
         yold = np.copy(ynew)
+        #print("error thing=", (ynew-yold)/yold)
         #print("yold =", yold)
         #print("ynew =", ynew)
         #print("density =", density)
@@ -231,8 +230,9 @@ def backwardEuler(density,PhotoDissRate,N,dt,iAlt):
         #print("k", K)
 
         ynew[0:s.nMajorSpecies] = yold[0:s.nMajorSpecies] - (linalg.inv(I-K*dt)).dot(g)
-        print("ynew =", ynew)
-        breakpoint()
+        # print("ynew =", ynew)
+        # print("yold =", yold)
+        # breakpoint()
         istep = istep + 1
 
     return ynew
